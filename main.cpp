@@ -202,6 +202,7 @@ int main(int argc, char * argv [])
         pf("step_out_err_max: " _BG_BLUE " %f " _RST " seed: %d\n", step_out_err_max, seed);
     }
 
+    fclose(file_errors_summary);
     fclose(file_errors_by_sample);
     PRINT_ON = 1;
     pf_bold("SEED: %d\n", seed);
