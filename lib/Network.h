@@ -15,6 +15,12 @@ class Network
             this->name = name;
         }
         
+        /**
+         * Create new network layer
+         * 
+         * @param name char * Layer name
+         * @param size int Number of perceptorns in the layer
+         */
         void createLayer(const char * name, int size) {
             Layer * previous = this->layers_count > 0 ? this->layers[this->layers_count - 1] : NULL;
             Layer * layer = new Layer (name, size, previous);
@@ -30,6 +36,12 @@ class Network
             return layers_count > 0 ? this->layers[0] : NULL;
         }
 
+        /**
+         * Set input layer value.
+         * 
+         * @param index int Input's layer perceptron index
+         * @param value float The value 
+         */
         void setInputValue(int index, float value) {
             if(!inputLayer()){
                 pf_red("Error: inputLayer is null.\n");
@@ -44,12 +56,20 @@ class Network
             inputLayer()->perceptrons[index]->result = value;
         }
 
+        /**
+         * Calculate results for each layer. From the input to the output
+         */
         void forward() {
-            for(int i = 1 /* skip input layer*/; i < layers_count; i++) {
+            for(int i = 1 /* skip input layer */; i < layers_count; i++) {
                 this->layers[i]->calculate_results();
             }
         }
 
+        /**
+         * Teach the network with target values. 
+         * This method finds errors for each layer from 
+         * the output to the input and then update weights.
+         */
         void learn(float data [], int size) {
             // validations    
             if(!outLayer()){
@@ -61,7 +81,7 @@ class Network
                 return;
             }
 
-            // set learn data to output layer (set errors as target-result)
+            // set learn data to output layer: set errors as (target - result)
             for(int i = 0; i < outLayer()->size; i++){
                 outLayer()->perceptrons[i]->error = data[i] - outLayer()->perceptrons[i]->result;
             }
@@ -77,6 +97,9 @@ class Network
             }
         }
 
+        /**
+         * Sum of all the layers error
+         */
         float errorSum() {
             float summary = 0;
             for(int i = 1; i < layers_count; i++) {
@@ -85,6 +108,9 @@ class Network
             return summary;
         }
 
+        /**
+         * Print network state to the console 
+         */
         void printState() {
             for (int l = 0; l < this->layers_count; l ++) {
                 Layer * layer = this->layers[l];
@@ -108,6 +134,11 @@ class Network
             }
         }
 
+        /**
+         * Save network state (weights + biases) to the file
+         * 
+         * @param filename char * Filename 
+         */
         void dumpWeights(const char * filename){
             // calculate buffer size
             int values_count = 0;
@@ -148,6 +179,11 @@ class Network
             fclose(file);
         }
 
+        /**
+         * Load network state (weights + biases) from the file
+         * 
+         * @param filename char * Filename 
+         */
         void loadWeights(const char * filename){
             FILE * file = fopen(filename, "r");
             if(!file){
