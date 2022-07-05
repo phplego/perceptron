@@ -1,0 +1,1 @@
+find .. -type f -iname "*.sh" | while read in; do chmod u+x "$in"; done
