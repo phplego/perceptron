@@ -81,7 +81,7 @@ float const learn_data[SAMPLES_COUNT][11] = {
         _0, _1, _0,   _1 /*vert*/, _1 /*horiz*/},  
 
     {   _0, _1, _0, 
-        _0, _1, _0,   // палочка |
+        _0, _1, _0,   // short v-line
         _0, _0, _0,   _1 /*vert*/, _0 /*horiz*/},  
 
     {   _0, _0, _0, 
@@ -144,10 +144,10 @@ int main(int argc, char * argv [])
 
 
     Network net("net1");
-    net.createLayer("input",    9);   // 9 пикселей на входе
+    net.createLayer("input",    9);   // 9 pixes input
     net.createLayer("lay1",     5);
     net.createLayer("lay2",     3);
-    net.createLayer("out",      2);   // два нейрона на выходе
+    net.createLayer("out",      2);   // two neurons at the output
 
     //net.loadWeights("weights.txt");
 
