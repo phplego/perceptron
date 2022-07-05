@@ -9,3 +9,4 @@ Some beautiful charts:
 
 ![image](https://user-images.githubusercontent.com/3162688/177391041-60c2f605-2ace-445f-9f8b-f7a63b2b083f.png)
 
+![image](https://user-images.githubusercontent.com/3162688/177391780-4fc87157-f153-4456-a1c1-7ed50f62d213.png)
