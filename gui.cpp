@@ -216,6 +216,15 @@ gboolean timeout_redraw(GtkWidget *widget)
     return TRUE;
 }
 
+gboolean on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+    printf("key pressed: %d\n", event->keyval);
+    if(event->keyval == 113 || event->keyval == 1738)
+        gtk_widget_destroy(widget);
+
+    return FALSE; 
+}
+
 void activate(GtkApplication *app, gpointer user_data)
 {
     GtkWidget *window;
@@ -261,6 +270,9 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_widget_add_events(drawing_area, GDK_BUTTON_PRESS_MASK);
     g_signal_connect(G_OBJECT(drawing_area), "button-press-event", G_CALLBACK(on_drawing_area_clicked), (void *)123123);
     gtk_container_add(GTK_CONTAINER(layout_box), drawing_area);
+
+    g_signal_connect (G_OBJECT (window), "key_press_event", G_CALLBACK (on_key_press), NULL);
+
 
     // redraw timer
     g_timeout_add(300, (GSourceFunc)timeout_redraw, drawing_area);
