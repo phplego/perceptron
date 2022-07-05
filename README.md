@@ -1,7 +1,13 @@
 # perceptron
 My simple C++ neural network
 
-Some beautiful charts:
+## build
+```
+g++ main.cpp -I./lib
+```
+
+
+## screenshots
 
 ![image](https://user-images.githubusercontent.com/3162688/177390689-d078550b-4f2a-47f4-bd77-382e9de41f6e.png)
 
