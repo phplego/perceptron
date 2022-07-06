@@ -15,12 +15,18 @@ typedef struct
     int color; // 0 - blue, 1 - red
 } Point;
 
-int buf_width = 1200;
-int buf_height = 800;
-GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, buf_width, buf_height);
-
 Point points[100];
 int points_count = 0;
+
+int buf_width = 1200;
+int buf_height = 800;
+
+// draw area pixel buffer
+GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, buf_width, buf_height);
+int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+// The pixel buffer in the GdkPixbuf instance
+guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
+
 
 bool thread_started = false;
 GMutex mutex_interface;
@@ -39,7 +45,6 @@ void init_network(){
     net->createLayer("output", 1); // one result - color
     g_mutex_unlock(&mutex_interface);
 }
-
 
 
 gpointer threadcompute(gpointer data)
@@ -90,45 +95,27 @@ void on_reset_button_clicked(GtkButton *button, gpointer data)
 
 void on_drawing_area_clicked(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
+    pf("area clicked btn: %d x: %f y: %f\n", event->button, event->x, event->y);
     guint width = gtk_widget_get_allocated_width(widget);
     guint height = gtk_widget_get_allocated_height(widget);
 
-    pf("area clicked %f\n", event->x);
-    pf("x = %f\n", event->x);
-    pf("y = %f\n", event->y);
-    pf("button = %d\n", event->button);
-    pf("\n");
     points[points_count].x = event->x / width;
     points[points_count].y = event->y / height;
     points[points_count].color = event->button == 1 ? 0 : 1;
     points_count++;
 
     gtk_widget_queue_draw(widget);
-    pf("added point. Total points %d\n", points_count);
+    pf("added new point. Total points: %d\n", points_count);
 }
 
 
 void put_pixel(GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar blue)
 {
     int n_channels = 3;
-
-    // // Ensure that the pixbuf is valid
-    // g_assert(gdk_pixbuf_get_colorspace(pixbuf) == GDK_COLORSPACE_RGB);
-    // g_assert(gdk_pixbuf_get_bits_per_sample(pixbuf) == 8);
-    // g_assert(!gdk_pixbuf_get_has_alpha(pixbuf));
-    // g_assert(n_channels == 3);
-
-    // int width = gdk_pixbuf_get_width(pixbuf);
-    // int height = gdk_pixbuf_get_height(pixbuf);
-
     // Ensure that the coordinates are in a valid range
     if(x >= buf_width || y >= buf_height)
         return;
 
-    int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
-
-    // The pixel buffer in the GdkPixbuf instance
-    guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
 
     // The pixel we wish to modify
     guchar *p = pixels + y * rowstride + x * n_channels;
@@ -155,7 +142,7 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
 
     // draw network predictions field to the buffer
     int scale = 3;
-    
+
     for (int y = 0; y < height / scale; y++)
     {
         for (int x = 0; x < width / scale; x++)
@@ -167,17 +154,15 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
             net->setInputValue(1, y_val);
             net->forward();
             float net_result = net->outLayer()->perceptrons[0]->result;
-            guchar red = 200 * net_result;
+            guchar red = 150;
             guchar blue = 200 - 200 * net_result;
+            guchar green = 200 * net_result;
             for(int i = 0; i < scale*scale; i++){
-                put_pixel(pixbuf, x * scale + (i/scale), y * scale + (i % scale), red, 100, blue);
+                put_pixel(pixbuf, x * scale + (i/scale), y * scale + (i % scale), red, green, blue);
             }
             g_mutex_unlock(&mutex_interface);
         }
     }
-
-
-
     gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
     cairo_paint(cr);
 
@@ -193,12 +178,13 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
             // blue
             color.green = 0;
             color.red = 0.1;
-            color.blue = 1;
+            color.blue = 0.7;
         }
         else
         {
+            // red
             color.green = 0;
-            color.red = 1;
+            color.red = 0.7;
             color.blue = 0.1;
         }
         gdk_cairo_set_source_rgba(cr, &color);
@@ -271,11 +257,11 @@ void activate(GtkApplication *app, gpointer user_data)
     g_signal_connect(G_OBJECT(drawing_area), "button-press-event", G_CALLBACK(on_drawing_area_clicked), (void *)123123);
     gtk_container_add(GTK_CONTAINER(layout_box), drawing_area);
 
-    g_signal_connect (G_OBJECT (window), "key_press_event", G_CALLBACK (on_key_press), NULL);
+    g_signal_connect (G_OBJECT (window), "key-press-event", G_CALLBACK (on_key_press), NULL);
 
 
     // redraw timer
-    g_timeout_add(300, (GSourceFunc)timeout_redraw, drawing_area);
+    g_timeout_add(30, (GSourceFunc)timeout_redraw, drawing_area);
 
     gtk_widget_show_all(window);
 }
