@@ -324,6 +324,7 @@ void activate(GtkApplication *app, gpointer user_data)
 
     g_signal_connect (G_OBJECT (window), "key-press-event", G_CALLBACK (on_key_press), NULL);
 
+    gtk_window_set_icon_from_file((GtkWindow*)window, "gui_icon.png", NULL);
 
     // redraw timer
     g_timeout_add(30, (GSourceFunc)timeout_redraw, drawing_area);
