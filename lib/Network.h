@@ -14,6 +14,14 @@ class Network
         Network(const char * name) {
             this->name = name;
         }
+
+        int layersCount(){
+            return this->layers_count;
+        }
+
+        Layer * getLayer(int index) {
+            return this->layers[index];
+        }
         
         /**
          * Create new network layer

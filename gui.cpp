@@ -268,7 +268,13 @@ void on_drawing_area_clicked(GtkWidget *widget, GdkEventButton *event, gpointer 
     pf("added new point. Total points: %d\n", points_count);
 }
 
-
+std::string get_network_title(Network * network){
+    std::string result = "";
+    for(int l = 0; l < net->layersCount(); l++){
+        result += (l ? "-" : "") + std::to_string(net->getLayer(l)->size) ;
+    }
+    return result;
+}
 
 
 void activate(GtkApplication *app, gpointer user_data)
@@ -283,7 +289,8 @@ void activate(GtkApplication *app, gpointer user_data)
     GtkWidget *drawing_area;
 
     window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "Network Result");
+    static std::string window_title = "Network " + get_network_title(net);
+    gtk_window_set_title(GTK_WINDOW(window), window_title.c_str());
     // gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
     layout_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
