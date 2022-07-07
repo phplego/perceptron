@@ -1,12 +1,8 @@
 // based on gtk simplest example: https://developer.gnome.org/gtk3/stable/gtk-getting-started.html
+#include <sys/time.h>
 #include <gtk/gtk.h>
 
-//#include <cstdlib>
-//#include <algorithm> //std::min,max and etc
-//#include "definitions.h"
-
-#include <sys/time.h>
-
+#include "definitions.h"
 #include "Network.h"
 #include "Perceptron.cpp"
 #include "Layer.cpp"
@@ -28,7 +24,6 @@ int buf_height = 800;
 
 // draw area pixel buffer
 GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, buf_width, buf_height);
-int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
 // The pixel buffer in the GdkPixbuf instance
 guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
 
@@ -71,6 +66,8 @@ gpointer threadcompute(gpointer data)
         for(int i=0; i < points_count; i++){
             usleep(1);
             epoch_count ++;
+            
+            // teach the network with one point
             g_mutex_lock(&mutex_interface);
             PRINT_ON = false;
             Point p = points[i];
@@ -90,7 +87,8 @@ gpointer threadcompute(gpointer data)
 
 void put_pixel(GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar blue)
 {
-    int n_channels = 3;
+    static int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+    static int n_channels = gdk_pixbuf_get_n_channels(pixbuf);
     // Ensure that the coordinates are in a valid range
     if(x >= buf_width || y >= buf_height)
         return;
@@ -101,7 +99,7 @@ void put_pixel(GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar
     p[0] = red;
     p[1] = green;
     p[2] = blue;
-    p[3] = 255;
+    //p[3] = 255;
 }
 
 gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
@@ -196,7 +194,6 @@ gboolean timeout_label(GtkWidget *widget)
     if(cur_time - last_time > 0){
         int time_elapsed = cur_time - last_time;
         speed = (epoch_count - last_epoch_count) / (cur_time - last_time);
-        //speed = (cur_time - last_time);
     }
 
     last_time = cur_time;
@@ -214,7 +211,7 @@ gboolean timeout_label(GtkWidget *widget)
 gboolean on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
     printf("key pressed: %d\n", event->keyval);
-    if(event->keyval == 113 || event->keyval == 1738)
+    if(event->keyval == 113/*q*/ || event->keyval == 1738/*й*/ || event->keyval == 65307 /*esc*/)
         gtk_widget_destroy(widget);
 
     return FALSE; 
