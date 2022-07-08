@@ -14,7 +14,8 @@ typedef struct
     int color; // 0 - blue, 1 - red
 } Point;
 
-int epoch_count = 0;
+int epoch_count = 0; // epoch means training the neural network with all the training data for one cycle
+int train_count = 0; // number of singe trainings. (train_count = epoch_count * points_count)
 
 Point points[100];
 int points_count = 0;
@@ -62,10 +63,13 @@ gpointer threadcompute(gpointer data)
             thread_started = false;
             return NULL;
         }
+        if(!points_count){
+            usleep(10000);
+            continue;
+        }
         // for each point
         for(int i=0; i < points_count; i++){
             usleep(1);
-            epoch_count ++;
             
             // teach the network with one point
             g_mutex_lock(&mutex_interface);
@@ -78,8 +82,10 @@ gpointer threadcompute(gpointer data)
             float arr [1] = {p.color ? 0.9f : 0.1f};
             net->learn(arr, 1);
             PRINT_ON = true;
+            train_count++;
             g_mutex_unlock(&mutex_interface);
         }
+        epoch_count ++;
     }
     return NULL;
 }
@@ -182,28 +188,46 @@ gboolean timeout_redraw(GtkWidget *widget)
 
 gboolean timeout_label(GtkWidget *widget)
 {
-    static int last_time = 0;
+    static int last_time_ms = 0;
     static int last_epoch_count = 0;
+    static int last_train_count = 0;
     g_mutex_lock(&mutex_interface);
 
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    int cur_time = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-    int speed = 0;
+    int cur_time_ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    int epoch_per_second = 0;
+    int train_per_second = 0;
 
-    if(cur_time - last_time > 0){
-        int time_elapsed = cur_time - last_time;
-        speed = (epoch_count - last_epoch_count) / (cur_time - last_time);
+    if(cur_time_ms - last_time_ms > 0){
+        int time_elapsed = cur_time_ms - last_time_ms;
+        epoch_per_second = 1000 * (epoch_count - last_epoch_count) / (cur_time_ms - last_time_ms);
+        train_per_second = 1000 * (train_count - last_train_count) / (cur_time_ms - last_time_ms);
+        epoch_per_second = std::max(0, epoch_per_second);
+        train_per_second = std::max(0, train_per_second);
     }
 
-    last_time = cur_time;
+    last_time_ms = cur_time_ms;
     last_epoch_count = epoch_count;
+    last_train_count = train_count;
+
     
-    std::string str = "";
-    str += "<span foreground='gray' size='small'>epoch: </span> <b>" +std::to_string(epoch_count / 1000) + " k</b>  ";
-    str += "<span foreground='gray' size='small'>speed: </span> <b>" + std::to_string(speed) + " e/ms</b>  ";
-    str += "<span foreground='gray' size='small'>outerr: </span> <b>" + std::to_string(net->outLayer()->errorAbsSum()).substr(0, 6) + "</b>";
-    gtk_label_set_markup((GtkLabel*)widget, str.c_str());
+    static const char * fmt =   "<tt>"
+                                "<span foreground='gray' size='small'>   epoch: </span><b>% 5d</b> k  "
+                                "<span foreground='gray' size='small'>speed: </span><b>% 6.2f</b> ke/s  \n"
+                                "<span foreground='gray' size='small'>   error: </span><b><span foreground='%s'>%.3f</span></b>    "
+                                "<span foreground='gray' size='small'>       </span> <b>% 4.1f</b> kt/s"
+                                "</tt>";
+    static char buf [500];
+
+    sprintf(buf, fmt, 
+        epoch_count / 1000, 
+        (float) epoch_per_second / 1000, 
+        net->outLayer()->errorAbsSum() < 0.05 ? "lightgray" : "magenta",
+        net->outLayer()->errorAbsSum(),
+        (float) train_per_second / 1000);
+
+    gtk_label_set_markup((GtkLabel*)widget, buf);
     g_mutex_unlock(&mutex_interface);
     return TRUE;
 }
