@@ -7,11 +7,13 @@
 
 
 auto activation = [](auto x) { 
-    return 1.0 / (1 + exp(-x));
+    return 1.0f / (1.0f + exp(-x));     // Sigmoid / Logistic Function
+    //return std::max(0.0f, x);       // ReLU
 };
 
 auto derivative = [](auto y) { 
-    return y * (1 - y);
+    return y * (1.0f - y);             // Sigmoid / Logistic Function 
+    //return y > 0.0f ? 1.0f : 0.0f;  // ReLU
 };
 
 Perceptron::Perceptron(const char * name, int input_count)
