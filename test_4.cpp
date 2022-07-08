@@ -19,17 +19,24 @@ int main(int argc, char * argv [])
 { 
     pf_green("Activation chart..\n");
 
-    FILE * file = fopen("plot2.data", "w");
+    std::string filename = "test_4.data";
+    FILE * file = fopen(filename.c_str(), "w");
+
+    char buf [100];
 
     for (int i = 0; i < 100; i++)
     {
-        float value = -5+(float)i/10;
-        pf("[%02d] activation(%.2f) = %.2f\n" _RST, i, value, activation(value));
-
-        char buf [100];
-        sprintf(buf, "%f\n", activation(value));
+        float value = -5 + (float)i / 10;
+        sprintf(buf, "%f %f\n", value, activation(value));
         fputs(buf, file);  
     }
 
     fclose(file);
+
+    // run gnuplot
+    std::string cmd = "gnuplot -e \"plot '" + filename + "'; pause -1\"";
+    printf("EXEC CMD: %s\n", cmd.c_str());
+    int res = system(cmd.c_str());
+    printf("EXIT CODE: %d\n", res);
+
 }
