@@ -70,16 +70,21 @@ void Perceptron::update_weights(float learning_rate)
     pf(_BLUE _BOLD "%-7s" _RST, this->name);
     pf(_MAGENTA " update_weights: error: " _RST _RED "%+05.2f" _RST " weights: ", this->error);
 
+    // weight correction formula
+    auto correct_weight = [](float rate, float old_weight, float err, float result, float input){
+        return old_weight + rate * err * derivative(result) * input;
+    };
+
     // update weights
     for(int i = 0; i < this->input_count; i++){
         float old_weight = this->weights[i];
-        this->weights[i] = this->weights[i] + learning_rate * this->error * derivative(this->result) * (*this->inputs[i]);
+        this->weights[i] = correct_weight(learning_rate, this->weights[i], this->error, this->result, *this->inputs[i]);
         pf("w%+5.3f", this->weights[i]);
         pf(_CYAN "Δ%+.0fm " _RST, (this->weights[i] - old_weight) * 1000);
     }
     // correct bias same way as other weights have been corrected
     float old_bias = this->bias;
-    this->bias = this->bias + learning_rate * this->error * derivative(this->result) * (1);
+    this->bias = correct_weight(learning_rate, this->bias, this->error, this->result, 1);
     pf_gray("b%+.2f", this->bias);
     pf_gray(_CYAN2 "Δ%+.0fm " _RST, (this->bias - old_bias) * 1000);
     
