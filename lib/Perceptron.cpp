@@ -4,17 +4,64 @@
 #include "definitions.h"
 #include "Perceptron.h"
 
-
-
-auto activation = [](auto x) { 
-    return 1.0f / (1.0f + exp(-x));     // Sigmoid / Logistic Function
-    //return std::max(0.0f, x);       // ReLU
+typedef float (*FLOAT_FUNCTION)(float);
+struct ActivationStruct {
+    FLOAT_FUNCTION activation;
+    FLOAT_FUNCTION derivative;
 };
 
-auto derivative = [](auto y) { 
-    return y * (1.0f - y);             // Sigmoid / Logistic Function 
-    //return y > 0.0f ? 1.0f : 0.0f;  // ReLU
+
+float learning_rate = 0.05;
+int activation_function_index = 0;
+
+
+ActivationStruct activation_groups [3] = {
+    ActivationStruct{ // Sigmoid / Logistic Function
+        activation: [](float x) { return 1.0f / (1.0f + (float)exp(-x));},
+        derivative: [](float y) { return y * (1.0f - y);},
+    },
+
+    ActivationStruct{ // Leaky ReLU
+        activation: [](float x) { return x >= 0.0f ? x : 0.01f * x;},
+        derivative: [](float y) { return y >= 0.0f ? 1.0f : 0.01f;},
+    },
+
+    ActivationStruct{ // Caped Leaky ReLU 
+        activation: [](float x) { 
+            if(x >= 0.0f){
+                if(x > 1.0f){
+                    return 1 + 0.01f * (x-1);
+                }
+                else{ 
+                    return x;
+                }
+            }
+            else{
+                return 0.01f * x;
+            }
+        },
+        derivative: [](float y) { 
+            if(y < 0 || y > 1.0f){
+                return 0.01f;
+            }
+            else{
+                return 1.0f;
+            }
+        },
+    },
 };
+
+
+
+FLOAT_FUNCTION activation = [](float x) { 
+    return activation_groups[activation_function_index].activation(x);
+};
+
+FLOAT_FUNCTION derivative = [](float y) { 
+    return activation_groups[activation_function_index].derivative(y);
+};
+
+
 
 Perceptron::Perceptron(const char * name, int input_count)
 {
@@ -29,7 +76,6 @@ Perceptron::Perceptron(const char * name, int input_count)
         this->weights[i] = (float) rand() / RAND_MAX - 0.5;
     }
     this->bias = (float) rand() / RAND_MAX - 0.5;
-    
 }
 
 Perceptron::~Perceptron()
@@ -67,7 +113,7 @@ float Perceptron::_calculate_result()
 }
 
 
-void Perceptron::update_weights(float learning_rate)
+void Perceptron::update_weights()
 {
     pf(_BLUE _BOLD "%-7s" _RST, this->name);
     pf(_MAGENTA " update_weights: error: " _RST _RED "%+05.2f" _RST " weights: ", this->error);

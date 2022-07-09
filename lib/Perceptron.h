@@ -15,7 +15,7 @@ class Perceptron {
         ~Perceptron();
         void calculate_and_update_result();
         float _calculate_result();
-        void update_weights(float learning_rate);
+        void update_weights();
 
 };
 

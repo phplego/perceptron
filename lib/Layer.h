@@ -11,8 +11,6 @@ class Layer
         Layer * prevLayer = NULL;
         Layer * nextLayer = NULL;
 
-        float learningRate = 0.05;
-
         Layer(const char * name, int size,  Layer * previous);
         void calculate_results();
         void findErrors();

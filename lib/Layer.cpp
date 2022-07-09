@@ -84,7 +84,7 @@ void Layer::update_weights()
 {
     for (int i = 0; i < this->size; i++)
     {
-        this->perceptrons[i]->update_weights(this->learningRate);
+        this->perceptrons[i]->update_weights();
     }
 }
 

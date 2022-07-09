@@ -302,6 +302,24 @@ void on_drawing_area_clicked(GtkWidget *widget, GdkEventButton *event, gpointer 
     pf("added new point. Total points: %d\n", points_count);
 }
 
+void on_combo1_changed(GtkComboBox *combo, gpointer data){
+    gint act = gtk_combo_box_get_active(combo);
+    activation_function_index = act;
+    pf("changed index %d\n", act);
+}
+
+void on_combo2_changed(GtkComboBox *combo, gpointer data){
+    gint act = gtk_combo_box_get_active(combo);
+    switch(act){
+        case 0: learning_rate = 0.01; break;
+        case 1: learning_rate = 0.05; break;
+        case 2: learning_rate = 0.1;  break;
+        case 3: learning_rate = 0.2;  break;
+    }
+    pf("LR changed to %f\n", learning_rate);
+}
+
+
 std::string get_network_title(Network * network){
     std::string result = "";
     for(int l = 0; l < net->layersCount(); l++){
@@ -319,8 +337,11 @@ void activate(GtkApplication *app, gpointer user_data)
     GtkWidget *button3;
     GtkWidget *layout_box;
     GtkWidget *button_box;
+    GtkWidget *button_box2;
     GtkWidget *label_epochs;
     GtkWidget *drawing_area;
+    GtkWidget *combo1;
+    GtkWidget *combo2;
 
     window = gtk_application_window_new(app);
     static std::string window_title = "Network " + get_network_title(net);
@@ -350,7 +371,30 @@ void activate(GtkApplication *app, gpointer user_data)
 
     label_epochs = gtk_label_new("epoches: ");
     gtk_container_add(GTK_CONTAINER(layout_box), label_epochs);
-    
+
+    button_box2 = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_button_box_set_layout((GtkButtonBox *)button_box2, GTK_BUTTONBOX_SPREAD);
+    //gtk_widget_set_margin_start(button_box2, 10);
+    gtk_container_add(GTK_CONTAINER(layout_box), button_box2);
+
+
+    combo1 = gtk_combo_box_text_new();
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, "Sigmoid");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, "LeakReLU");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, "CapReLU");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo1), 0);
+    g_signal_connect(combo1, "changed", G_CALLBACK(on_combo1_changed), NULL);
+    gtk_container_add(GTK_CONTAINER(button_box2), combo1);
+
+    combo2 = gtk_combo_box_text_new();
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.01");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.05");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.10");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.2");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo2), 1);
+    g_signal_connect(combo2, "changed", G_CALLBACK(on_combo2_changed), NULL);
+    gtk_container_add(GTK_CONTAINER(button_box2), combo2);
+
 
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, 300, 300);
