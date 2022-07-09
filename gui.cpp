@@ -69,7 +69,7 @@ gpointer threadcompute(gpointer data)
         }
         // for each point
         for(int i=0; i < points_count; i++){
-            usleep(1);
+            usleep(0);
             
             // teach the network with one point
             g_mutex_lock(&mutex_interface);
@@ -117,8 +117,8 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
     context = gtk_widget_get_style_context(widget);
     width = (int) gtk_widget_get_allocated_width(widget);
     height = (int) gtk_widget_get_allocated_height(widget);
-    width = std::min<int>(width, buf_width);
-    height = std::min<int>(height, buf_height);
+    width   = MIN(width, buf_width);
+    height  = MIN(height, buf_height);
     // gtk_render_background(context, cr, 0, 0, width, height);
     // gtk_style_context_get_color(context, gtk_style_context_get_state(context), &color);
     color.alpha = 1;
@@ -137,9 +137,13 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
             net->setInputValue(1, y_val);
             net->forward();
             float net_result = net->outLayer()->perceptrons[0]->result;
-            guchar green = 150;
-            guchar blue = 200 - 200 * net_result;
-            guchar red = 200 * net_result;
+
+            float br = 100 * (1 - std::abs(0.5 - net_result));
+            guchar green = 128 + br;
+            guchar blue  = MIN(255, 221 - 200 * net_result + br);
+            guchar red   = MIN(255, 49 + 200 * net_result + br);
+            
+
             for(int i = 0; i < scale*scale; i++){
                 put_pixel(pixbuf, x * scale + (i/scale), y * scale + (i % scale), red, green, blue);
             }
@@ -154,26 +158,36 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
     {
         Point p = points[i];
         cairo_rectangle(cr, p.x * std::min((int)width, buf_width) - 5, p.y * std::min((int)height, buf_height) - 5, 10, 10);
-        //cairo_arc(cr, p.x * std::min((int)width, buf_width), p.y * std::min((int)height, buf_height), 5, 0, 360);
+
+        color.green = 1;
+        color.red = 1;
+        color.blue = 1;
+        
+        gdk_cairo_set_source_rgba(cr, &color);
+        cairo_set_line_width(cr, 2);
+        cairo_stroke_preserve(cr);
+
+
+
         color.green = 0;
         if (p.color == 0)
         {
             // blue
-            color.green = 0.3;
-            color.red = 0.1;
-            color.blue = 0.7;
+            color.green = 0.7;
+            color.red = 0.5;
+            color.blue = 1;
         }
         else
         {
             // red
-            color.green = 0.2;
-            color.red = 0.7;
-            color.blue = 0.1;
+            color.green = 0.8;
+            color.red = 1;
+            color.blue = 0.5;
         }
+
         gdk_cairo_set_source_rgba(cr, &color);
         cairo_fill(cr);
     }
-
 
     return FALSE;
 }
@@ -201,10 +215,10 @@ gboolean timeout_label(GtkWidget *widget)
 
     if(cur_time_ms - last_time_ms > 0){
         int time_elapsed = cur_time_ms - last_time_ms;
-        epoch_per_second = 1000 * (epoch_count - last_epoch_count) / (cur_time_ms - last_time_ms);
-        train_per_second = 1000 * (train_count - last_train_count) / (cur_time_ms - last_time_ms);
-        epoch_per_second = std::max(0, epoch_per_second);
-        train_per_second = std::max(0, train_per_second);
+        epoch_per_second = 1000 * (epoch_count - last_epoch_count) / time_elapsed;
+        train_per_second = 1000 * (train_count - last_train_count) / time_elapsed;
+        epoch_per_second = MAX(0, epoch_per_second);
+        train_per_second = MAX(0, train_per_second);
     }
 
     last_time_ms = cur_time_ms;
@@ -237,7 +251,6 @@ gboolean on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data
     printf("key pressed: %d\n", event->keyval);
     if(event->keyval == 113/*q*/ || event->keyval == 1738/*й*/ || event->keyval == 65307 /*esc*/)
         gtk_widget_destroy(widget);
-
     return FALSE; 
 }
 
@@ -249,7 +262,7 @@ void on_start_button_clicked(GtkButton *button, gpointer data)
     }
     else {
         epoch_count = 0;
-        g_thread_new("thread", threadcompute, data);
+        g_thread_new("compute-thread", threadcompute, data);
         gtk_button_set_label(button, "Stop");
     }
 }
@@ -274,8 +287,8 @@ void on_drawing_area_clicked(GtkWidget *widget, GdkEventButton *event, gpointer 
     pf("area clicked btn: %d x: %f y: %f\n", event->button, event->x, event->y);
     int width = gtk_widget_get_allocated_width(widget);
     int height = gtk_widget_get_allocated_height(widget);
-    width = std::min(width, buf_width);
-    height = std::min(height, buf_height);
+    width = MIN(width, buf_width);
+    height = MIN(height, buf_height);
     
     if(event->x > width || event->y > height)
         return;
