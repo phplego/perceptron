@@ -1,66 +1,20 @@
-//#include <cstdlib>
-//#include <cmath>
 #include <random>
 #include "definitions.h"
+#include "activation_functions.h"
 #include "Perceptron.h"
 
-typedef float (*FLOAT_FUNCTION)(float);
-struct ActivationStruct {
-    FLOAT_FUNCTION activation;
-    FLOAT_FUNCTION derivative;
+
+float learning_rate             = 0.05;
+int activation_function_index   = 0;
+
+
+FLOAT_FUNCTION activation_function = [](float x) { 
+    return activation_bundles[activation_function_index].activation(x);
 };
 
-
-float learning_rate = 0.05;
-int activation_function_index = 0;
-
-
-ActivationStruct activation_groups [3] = {
-    ActivationStruct{ // Sigmoid / Logistic Function
-        activation: [](float x) { return 1.0f / (1.0f + (float)exp(-x));},
-        derivative: [](float y) { return y * (1.0f - y);},
-    },
-
-    ActivationStruct{ // Leaky ReLU
-        activation: [](float x) { return x >= 0.0f ? x : 0.01f * x;},
-        derivative: [](float y) { return y >= 0.0f ? 1.0f : 0.01f;},
-    },
-
-    ActivationStruct{ // Caped Leaky ReLU 
-        activation: [](float x) { 
-            if(x >= 0.0f){
-                if(x > 1.0f){
-                    return 1 + 0.01f * (x-1);
-                }
-                else{ 
-                    return x;
-                }
-            }
-            else{
-                return 0.01f * x;
-            }
-        },
-        derivative: [](float y) { 
-            if(y < 0 || y > 1.0f){
-                return 0.01f;
-            }
-            else{
-                return 1.0f;
-            }
-        },
-    },
+FLOAT_FUNCTION derivative_function = [](float y) { 
+    return activation_bundles[activation_function_index].derivative(y);
 };
-
-
-
-FLOAT_FUNCTION activation = [](float x) { 
-    return activation_groups[activation_function_index].activation(x);
-};
-
-FLOAT_FUNCTION derivative = [](float y) { 
-    return activation_groups[activation_function_index].derivative(y);
-};
-
 
 
 Perceptron::Perceptron(const char * name, int input_count)
@@ -109,7 +63,7 @@ float Perceptron::_calculate_result()
     }
     sum += bias; // add bias
 
-    return activation(sum);
+    return activation_function(sum);
 }
 
 
@@ -120,7 +74,7 @@ void Perceptron::update_weights()
 
     // weight correction formula
     auto correct_weight = [](float rate, float old_weight, float err, float result, float input){
-        return old_weight + rate * err * derivative(result) * input;
+        return old_weight + rate * err * derivative_function(result) * input;
     };
 
     // update weights

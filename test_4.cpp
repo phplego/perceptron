@@ -5,11 +5,11 @@
 #include "Layer.cpp"
 
 
-// auto activation = [](auto x) { 
+// auto activation_function = [](auto x) { 
 //     return 1.0 / (1 + exp(-x));
 // };
 
-// auto derivative = [](auto y) { 
+// auto derivative_function = [](auto y) { 
 //     return y * (1 - y);
 // };
 
@@ -27,7 +27,7 @@ int main(int argc, char * argv [])
     for (int i = 0; i < 100; i++)
     {
         float value = -5 + (float)i / 10;
-        sprintf(buf, "%f %f\n", value, activation(value));
+        sprintf(buf, "%f %f\n", value, activation_bundles[2].activation(value));
         fputs(buf, file);  
     }
 

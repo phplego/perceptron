@@ -379,9 +379,9 @@ void activate(GtkApplication *app, gpointer user_data)
 
 
     combo1 = gtk_combo_box_text_new();
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, "Sigmoid");
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, "LeakReLU");
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, "CapReLU");
+    for(int i = 0; i < ACTIVATION_BUNDLES_SIZE; i++){
+        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, activation_bundles[i].name);
+    }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo1), 0);
     g_signal_connect(combo1, "changed", G_CALLBACK(on_combo1_changed), NULL);
     gtk_container_add(GTK_CONTAINER(button_box2), combo1);
