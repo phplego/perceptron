@@ -31,6 +31,7 @@ guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
 
 bool thread_started = false;
 bool thread_exit = false;
+bool thread_sleep = true;
 GMutex mutex_interface;
 
 Network * net;
@@ -58,6 +59,7 @@ gpointer threadcompute(gpointer data)
 
     while (true)
     {
+        usleep(0);
         if(thread_exit){
             thread_exit = false;
             thread_started = false;
@@ -69,7 +71,8 @@ gpointer threadcompute(gpointer data)
         }
         // for each point
         for(int i=0; i < points_count; i++){
-            usleep(0);
+            if(thread_sleep)
+                usleep(1);
             
             // teach the network with one point
             g_mutex_lock(&mutex_interface);
@@ -319,6 +322,11 @@ void on_combo2_changed(GtkComboBox *combo, gpointer data){
     pf("LR changed to %f\n", learning_rate);
 }
 
+void on_switch1_changed(GtkSwitch *sw, gpointer data){
+    gint act = gtk_switch_get_active(sw);
+    thread_sleep = (bool) act;
+    pf("sleep active %d\n", act);
+}
 
 std::string get_network_title(Network * network){
     std::string result = "";
@@ -342,18 +350,19 @@ void activate(GtkApplication *app, gpointer user_data)
     GtkWidget *drawing_area;
     GtkWidget *combo1;
     GtkWidget *combo2;
+    GtkWidget *switch1;
 
     window = gtk_application_window_new(app);
     static std::string window_title = "Network " + get_network_title(net);
     gtk_window_set_title(GTK_WINDOW(window), window_title.c_str());
     // gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
-    layout_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
+    layout_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(window), layout_box);
 
-    button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_button_box_set_layout((GtkButtonBox *)button_box, GTK_BUTTONBOX_SPREAD);
-    gtk_widget_set_margin_top(button_box, 20);
+    button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_widget_set_margin_start(button_box, 10);    
+    gtk_widget_set_margin_top(button_box, 10);
     // gtk_widget_set_vexpand(button_box, true);
     gtk_container_add(GTK_CONTAINER(layout_box), button_box);
 
@@ -370,11 +379,12 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_container_add(GTK_CONTAINER(button_box), button3);
 
     label_epochs = gtk_label_new("epoches: ");
+    gtk_widget_set_halign(label_epochs, GTK_ALIGN_START);
     gtk_container_add(GTK_CONTAINER(layout_box), label_epochs);
 
-    button_box2 = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_button_box_set_layout((GtkButtonBox *)button_box2, GTK_BUTTONBOX_SPREAD);
-    //gtk_widget_set_margin_start(button_box2, 10);
+    button_box2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    //gtk_button_box_set_layout((GtkButtonBox *)button_box2, GTK_BUTTONBOX_START);
+    gtk_widget_set_margin_start(button_box2, 10);
     gtk_container_add(GTK_CONTAINER(layout_box), button_box2);
 
 
@@ -394,6 +404,13 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo2), 1);
     g_signal_connect(combo2, "changed", G_CALLBACK(on_combo2_changed), NULL);
     gtk_container_add(GTK_CONTAINER(button_box2), combo2);
+
+    switch1 = gtk_switch_new();
+    gtk_switch_set_active((GtkSwitch*)switch1, true);
+    gtk_widget_set_halign(switch1, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(switch1, GTK_ALIGN_CENTER);
+    gtk_container_add(GTK_CONTAINER(button_box2), switch1);
+    g_signal_connect(switch1, "notify::active", G_CALLBACK(on_switch1_changed), NULL);
 
 
     drawing_area = gtk_drawing_area_new();
