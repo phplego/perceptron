@@ -340,13 +340,13 @@ std::string get_network_title(Network * network){
 void activate(GtkApplication *app, gpointer user_data)
 {
     GtkWidget *window;
-    GtkWidget *button;
+    GtkWidget *button1;
     GtkWidget *button2;
     GtkWidget *button3;
     GtkWidget *layout_box;
     GtkWidget *button_box;
     GtkWidget *button_box2;
-    GtkWidget *label_epochs;
+    GtkWidget *label1;
     GtkWidget *drawing_area;
     GtkWidget *combo1;
     GtkWidget *combo2;
@@ -366,9 +366,9 @@ void activate(GtkApplication *app, gpointer user_data)
     // gtk_widget_set_vexpand(button_box, true);
     gtk_container_add(GTK_CONTAINER(layout_box), button_box);
 
-    button = gtk_button_new_with_label("Start");
-    g_signal_connect(button, "clicked", G_CALLBACK(on_start_button_clicked), NULL);
-    gtk_container_add(GTK_CONTAINER(button_box), button);
+    button1 = gtk_button_new_with_label("Start");
+    g_signal_connect(button1, "clicked", G_CALLBACK(on_start_button_clicked), NULL);
+    gtk_container_add(GTK_CONTAINER(button_box), button1);
 
     button2 = gtk_button_new_with_label("Clear");
     g_signal_connect(button2, "clicked", G_CALLBACK(on_clear_button_clicked), NULL);
@@ -378,9 +378,9 @@ void activate(GtkApplication *app, gpointer user_data)
     g_signal_connect(button3, "clicked", G_CALLBACK(on_reset_button_clicked), NULL);
     gtk_container_add(GTK_CONTAINER(button_box), button3);
 
-    label_epochs = gtk_label_new("epoches: ");
-    gtk_widget_set_halign(label_epochs, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(layout_box), label_epochs);
+    label1 = gtk_label_new("epoches: ");
+    gtk_widget_set_halign(label1, GTK_ALIGN_START);
+    gtk_container_add(GTK_CONTAINER(layout_box), label1);
 
     button_box2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     //gtk_button_box_set_layout((GtkButtonBox *)button_box2, GTK_BUTTONBOX_START);
@@ -432,7 +432,7 @@ void activate(GtkApplication *app, gpointer user_data)
     g_timeout_add(30, (GSourceFunc)timeout_redraw, drawing_area);
 
     // update label timer
-    g_timeout_add(100, (GSourceFunc)timeout_label, label_epochs);
+    g_timeout_add(100, (GSourceFunc)timeout_label, label1);
 
     gtk_widget_show_all(window);
 }
