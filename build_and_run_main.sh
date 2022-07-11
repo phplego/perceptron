@@ -1,9 +1,9 @@
 clear
 
-g++ main.cpp -o main -I./lib
+g++ main.cpp -o main.out -I./lib
 
 if [[ $? -eq 0 ]]
 then
-    ./main $1 $2
+    ./main.out $1 $2
     ./plot1.sh
 fi

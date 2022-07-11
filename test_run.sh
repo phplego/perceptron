@@ -14,12 +14,12 @@ fi
 file="test_$TESTNAME"
 
 # build
-g++ "$file.cpp" -o $file -I./lib
+g++ "$file.cpp" -o $file.out -I./lib
 
 # if no error then run binary
 if [[ $? -eq 0 ]]
 then
-    ./$file $2 $3 $4
+    ./$file.out $2 $3 $4
 fi
 
 

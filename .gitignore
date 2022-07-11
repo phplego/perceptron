@@ -1,6 +1,4 @@
-*
-!lib
-!*.cpp
-!*.sh
-!*.md
-!*.png
+.vscode
+*.out
+*.data
+*.txt
