@@ -34,7 +34,7 @@ int main(int argc, char * argv [])
     fclose(file);
 
     // run gnuplot
-    std::string cmd = "gnuplot -e \"plot '" + filename + "'; pause -1\"";
+    std::string cmd = "gnuplot -e \"plot '" + filename + "'; pause mouse close\"";
     printf("EXEC CMD: %s\n", cmd.c_str());
     int res = system(cmd.c_str());
     printf("EXIT CODE: %d\n", res);

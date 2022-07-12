@@ -22,5 +22,5 @@ plot 'plot1.data' using 1 title 's1' with line, \
      'plot1.data' using 18 title 's18' with line, \
      'plot1.data' using 19 title 's19' with line, \
      'plot1.data' using 20 title 's20' with line;
-pause -1
+pause mouse close
 "
