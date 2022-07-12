@@ -1,4 +1,4 @@
-// based on gtk simplest example: https://developer.gnome.org/gtk3/stable/gtk-getting-started.html
+// based on gtk simplest example: https://docs.gtk.org/gtk3/getting_started.html
 #include <sys/time.h>
 #include <gtk/gtk.h>
 
