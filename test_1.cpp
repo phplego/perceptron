@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     while(p.error*p.error > 0.0001)
     {
         pf("%.2d ", step++);
-        p.update_weights(0.05);
+        p.update_weights();
         p.calculate_and_update_result();
         p.error = target - p.result;
         if(step > 100)
