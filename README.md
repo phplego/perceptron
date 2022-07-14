@@ -23,3 +23,6 @@ Gui for classic X-Y/dots task training:
 
 https://user-images.githubusercontent.com/3162688/179057547-757b8fb4-5c66-4b91-867f-32b074c9b84a.mp4
 
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
