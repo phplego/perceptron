@@ -314,10 +314,11 @@ void on_combo1_changed(GtkComboBox *combo, gpointer data){
 void on_combo2_changed(GtkComboBox *combo, gpointer data){
     gint act = gtk_combo_box_get_active(combo);
     switch(act){
-        case 0: learning_rate = 0.01; break;
-        case 1: learning_rate = 0.05; break;
-        case 2: learning_rate = 0.1;  break;
-        case 3: learning_rate = 0.2;  break;
+        case 0: learning_rate = 0.005; break;
+        case 1: learning_rate = 0.01; break;
+        case 2: learning_rate = 0.05; break;
+        case 3: learning_rate = 0.1;  break;
+        case 4: learning_rate = 0.2;  break;
     }
     pf("LR changed to %f\n", learning_rate);
 }
@@ -397,11 +398,12 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_container_add(GTK_CONTAINER(button_box2), combo1);
 
     combo2 = gtk_combo_box_text_new();
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.005");
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.01");
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.05");
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.10");
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.2");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(combo2), 1);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo2), 2); // 0.05
     g_signal_connect(combo2, "changed", G_CALLBACK(on_combo2_changed), NULL);
     gtk_container_add(GTK_CONTAINER(button_box2), combo2);
 
