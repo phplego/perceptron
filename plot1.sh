@@ -2,6 +2,7 @@
 
 
 gnuplot -e "
+set terminal wxt size 1300,600;
 plot 'plot1.data' using 1 title 's1' with line, \
      'plot1.data' using 2 title 's2' with line, \
      'plot1.data' using 3 title 's3' with line, \
