@@ -405,6 +405,10 @@ void activate(GtkApplication *app, gpointer user_data)
     g_signal_connect(combo2, "changed", G_CALLBACK(on_combo2_changed), NULL);
     gtk_container_add(GTK_CONTAINER(button_box2), combo2);
 
+
+    GtkWidget * labelSleep = gtk_label_new("sleep:");
+    gtk_container_add(GTK_CONTAINER(button_box2), labelSleep);
+
     switch1 = gtk_switch_new();
     gtk_switch_set_active((GtkSwitch*)switch1, true);
     gtk_widget_set_halign(switch1, GTK_ALIGN_CENTER);
