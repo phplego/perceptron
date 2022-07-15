@@ -282,6 +282,24 @@ void on_reset_button_clicked(GtkButton *button, gpointer data)
     init_network();
 }
 
+void on_rng_button_clicked(GtkButton *button, gpointer data)
+{
+    auto fRand = [](){
+        return (float)rand() / RAND_MAX;
+    };
+
+    int POINTS_MAX = 20;
+    int points_cnt = fRand() * POINTS_MAX;
+
+    points_count = 0; // clear points
+    for(int i = 0; i < points_cnt; i++){
+        points[points_count].x = fRand();
+        points[points_count].y = fRand();
+        points[points_count].color = fRand() > 0.5;
+        points_count++;
+    }
+}
+
 
 
 
@@ -344,6 +362,7 @@ void activate(GtkApplication *app, gpointer user_data)
     GtkWidget *button1;
     GtkWidget *button2;
     GtkWidget *button3;
+    GtkWidget *button4;
     GtkWidget *layout_box;
     GtkWidget *button_box;
     GtkWidget *button_box2;
@@ -378,6 +397,10 @@ void activate(GtkApplication *app, gpointer user_data)
     button3 = gtk_button_new_with_label("Reset");
     g_signal_connect(button3, "clicked", G_CALLBACK(on_reset_button_clicked), NULL);
     gtk_container_add(GTK_CONTAINER(button_box), button3);
+
+    button4 = gtk_button_new_with_label("RGN");
+    g_signal_connect(button4, "clicked", G_CALLBACK(on_rng_button_clicked), NULL);
+    gtk_container_add(GTK_CONTAINER(button_box), button4);
 
     label1 = gtk_label_new("epoches: ");
     gtk_widget_set_halign(label1, GTK_ALIGN_START);
