@@ -408,7 +408,7 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_container_add(GTK_CONTAINER(button_box2), combo2);
 
 
-    GtkWidget * labelSleep = gtk_label_new("sleep:");
+    GtkWidget * labelSleep = gtk_label_new("slp:");
     gtk_container_add(GTK_CONTAINER(button_box2), labelSleep);
 
     switch1 = gtk_switch_new();
