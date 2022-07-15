@@ -30,7 +30,7 @@ guchar *g_pixels = gdk_pixbuf_get_pixels(g_pixbuf);
 
 
 bool g_thread_started = false;
-bool g_thread_exit = false;
+bool g_thread_exit_flag = false;
 bool g_thread_sleep = true;
 GMutex g_mutex_interface;
 
@@ -60,8 +60,8 @@ gpointer threadcompute(gpointer data)
     while (true)
     {
         usleep(0);
-        if(g_thread_exit){
-            g_thread_exit = false;
+        if(g_thread_exit_flag){
+            g_thread_exit_flag = false;
             g_thread_started = false;
             return NULL;
         }
@@ -260,7 +260,7 @@ gboolean on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data
 void on_start_button_clicked(GtkButton *button, gpointer data)
 {
     if(g_thread_started){
-        g_thread_exit = true;
+        g_thread_exit_flag = true;
         gtk_button_set_label(button, "Start");
     }
     else {
