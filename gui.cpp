@@ -14,81 +14,81 @@ typedef struct
     int color; // 0 - blue, 1 - red
 } Point;
 
-int epoch_count = 0; // epoch means training the neural network with all the training data for one cycle
-int train_count = 0; // number of singe trainings. (train_count = epoch_count * points_count)
+int g_epoch_count = 0; // epoch means training the neural network with all the training data for one cycle
+int g_train_count = 0; // number of singe trainings. (train_count = epoch_count * points_count)
 
-Point points[100];
-int points_count = 0;
+Point g_points[100];
+int g_points_count = 0;
 
-int buf_width = 1200;
-int buf_height = 800;
+int g_buf_width = 1200;
+int g_buf_height = 800;
 
 // draw area pixel buffer
-GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, buf_width, buf_height);
+GdkPixbuf *g_pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, false, 8, g_buf_width, g_buf_height);
 // The pixel buffer in the GdkPixbuf instance
-guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
+guchar *g_pixels = gdk_pixbuf_get_pixels(g_pixbuf);
 
 
-bool thread_started = false;
-bool thread_exit = false;
-bool thread_sleep = true;
-GMutex mutex_interface;
+bool g_thread_started = false;
+bool g_thread_exit = false;
+bool g_thread_sleep = true;
+GMutex g_mutex_interface;
 
-Network * net;
+Network * g_net;
 
 void init_network(){
-    g_mutex_lock(&mutex_interface);
-    if(net){
-        delete net;
+    g_mutex_lock(&g_mutex_interface);
+    if(g_net){
+        delete g_net;
     }
-    net = new Network("net1");
-    net->createLayer("input", 2);  //input layer. 2 perceptrons: for x and for y
-    net->createLayer("hid1", 5);
-    net->createLayer("hid2", 5);
-    net->createLayer("output", 1); // one result - color
-    g_mutex_unlock(&mutex_interface);
+    g_net = new Network("net1");
+    g_net->createLayer("input", 2);  //input layer. 2 perceptrons: for x and for y
+    g_net->createLayer("hid1", 5);
+    g_net->createLayer("hid2", 5);
+    g_net->createLayer("output", 1); // one result - color
+    g_mutex_unlock(&g_mutex_interface);
 }
 
 
 gpointer threadcompute(gpointer data)
 {
-    if(thread_started)
+    if(g_thread_started)
         return NULL;
 
-    thread_started = true;
+    g_thread_started = true;
 
     while (true)
     {
         usleep(0);
-        if(thread_exit){
-            thread_exit = false;
-            thread_started = false;
+        if(g_thread_exit){
+            g_thread_exit = false;
+            g_thread_started = false;
             return NULL;
         }
-        if(!points_count){
+        if(!g_points_count){
             usleep(10000);
             continue;
         }
         // for each point
-        for(int i=0; i < points_count; i++){
-            if(thread_sleep)
+        for(int i=0; i < g_points_count; i++){
+            if(g_thread_sleep)
                 usleep(1);
             
             // teach the network with one point
-            g_mutex_lock(&mutex_interface);
+            g_mutex_lock(&g_mutex_interface);
             PRINT_ON = false;
-            Point p = points[i];
+            Point p = g_points[i];
             // set input data
-            net->setInputValue(0, p.x);
-            net->setInputValue(1, p.y);
-            net->forward();
+            g_net->setInputValue(0, p.x);
+            g_net->setInputValue(1, p.y);
+            g_net->forward();
             float arr [1] = {p.color ? 0.9f : 0.1f};
-            net->learn(arr, 1);
+            g_net->learn(arr, 1);
             PRINT_ON = true;
-            train_count++;
-            g_mutex_unlock(&mutex_interface);
+            g_train_count++;
+            g_mutex_unlock(&g_mutex_interface);
         }
-        epoch_count ++;
+        g_epoch_count ++;
     }
     return NULL;
 }
@@ -99,12 +99,12 @@ void put_pixel(GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar
     static int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
     static int n_channels = gdk_pixbuf_get_n_channels(pixbuf);
     // Ensure that the coordinates are in a valid range
-    if(x >= buf_width || y >= buf_height)
+    if(x >= g_buf_width || y >= g_buf_height)
         return;
 
 
     // The pixel we wish to modify
-    guchar *p = pixels + y * rowstride + x * n_channels;
+    guchar *p = g_pixels + y * rowstride + x * n_channels;
     p[0] = red;
     p[1] = green;
     p[2] = blue;
@@ -120,8 +120,8 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
     context = gtk_widget_get_style_context(widget);
     width = (int) gtk_widget_get_allocated_width(widget);
     height = (int) gtk_widget_get_allocated_height(widget);
-    width   = MIN(width, buf_width);
-    height  = MIN(height, buf_height);
+    width   = MIN(width, g_buf_width);
+    height  = MIN(height, g_buf_height);
     // gtk_render_background(context, cr, 0, 0, width, height);
     // gtk_style_context_get_color(context, gtk_style_context_get_state(context), &color);
     color.alpha = 1;
@@ -133,13 +133,13 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
     {
         for (int x = 0; x <= width / scale; x++)
         {
-            g_mutex_lock(&mutex_interface);
+            g_mutex_lock(&g_mutex_interface);
             float x_val = (float) (x+0.5) / width * scale;
             float y_val = (float) (y+0.5) / height * scale;
-            net->setInputValue(0, x_val);
-            net->setInputValue(1, y_val);
-            net->forward();
-            float net_result = net->outLayer()->perceptrons[0]->result;
+            g_net->setInputValue(0, x_val);
+            g_net->setInputValue(1, y_val);
+            g_net->forward();
+            float net_result = g_net->outLayer()->perceptrons[0]->result;
 
             float br = 100 * (1 - std::abs(0.5 - net_result));
             guchar green = 128 + br;
@@ -148,19 +148,19 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
             
 
             for(int i = 0; i < scale*scale; i++){
-                put_pixel(pixbuf, x * scale + (i/scale), y * scale + (i % scale), red, green, blue);
+                put_pixel(g_pixbuf, x * scale + (i/scale), y * scale + (i % scale), red, green, blue);
             }
-            g_mutex_unlock(&mutex_interface);
+            g_mutex_unlock(&g_mutex_interface);
         }
     }
-    gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+    gdk_cairo_set_source_pixbuf(cr, g_pixbuf, 0, 0);
     cairo_paint(cr);
 
     // draw points
-    for (int i = 0; i < points_count; i++)
+    for (int i = 0; i < g_points_count; i++)
     {
-        Point p = points[i];
-        cairo_rectangle(cr, p.x * std::min((int)width, buf_width) - 5, p.y * std::min((int)height, buf_height) - 5, 10, 10);
+        Point p = g_points[i];
+        cairo_rectangle(cr, p.x * std::min((int)width, g_buf_width) - 5, p.y * std::min((int)height, g_buf_height) - 5, 10, 10);
 
         color.green = 1;
         color.red = 1;
@@ -208,7 +208,7 @@ gboolean timeout_label(GtkWidget *widget)
     static int last_time_ms = 0;
     static int last_epoch_count = 0;
     static int last_train_count = 0;
-    g_mutex_lock(&mutex_interface);
+    g_mutex_lock(&g_mutex_interface);
 
     struct timeval tp;
     gettimeofday(&tp, NULL);
@@ -218,15 +218,15 @@ gboolean timeout_label(GtkWidget *widget)
 
     if(cur_time_ms - last_time_ms > 0){
         int time_elapsed = cur_time_ms - last_time_ms;
-        epoch_per_second = 1000 * (epoch_count - last_epoch_count) / time_elapsed;
-        train_per_second = 1000 * (train_count - last_train_count) / time_elapsed;
+        epoch_per_second = 1000 * (g_epoch_count - last_epoch_count) / time_elapsed;
+        train_per_second = 1000 * (g_train_count - last_train_count) / time_elapsed;
         epoch_per_second = MAX(0, epoch_per_second);
         train_per_second = MAX(0, train_per_second);
     }
 
     last_time_ms = cur_time_ms;
-    last_epoch_count = epoch_count;
-    last_train_count = train_count;
+    last_epoch_count = g_epoch_count;
+    last_train_count = g_train_count;
 
     
     static const char * fmt =   "<tt>"
@@ -238,14 +238,14 @@ gboolean timeout_label(GtkWidget *widget)
     static char buf [500];
 
     sprintf(buf, fmt, 
-        epoch_count / 1000, 
+        g_epoch_count / 1000, 
         (float) epoch_per_second / 1000, 
-        net->outLayer()->errorAbsSum() < 0.05 ? "lightgray" : "magenta",
-        net->outLayer()->errorAbsSum(),
+        g_net->outLayer()->errorAbsSum() < 0.05 ? "lightgray" : "magenta",
+        g_net->outLayer()->errorAbsSum(),
         (float) train_per_second / 1000);
 
     gtk_label_set_markup((GtkLabel*)widget, buf);
-    g_mutex_unlock(&mutex_interface);
+    g_mutex_unlock(&g_mutex_interface);
     return TRUE;
 }
 
@@ -259,12 +259,12 @@ gboolean on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data
 
 void on_start_button_clicked(GtkButton *button, gpointer data)
 {
-    if(thread_started){
-        thread_exit = true;
+    if(g_thread_started){
+        g_thread_exit = true;
         gtk_button_set_label(button, "Start");
     }
     else {
-        epoch_count = 0;
+        g_epoch_count = 0;
         g_thread_new("compute-thread", threadcompute, data);
         gtk_button_set_label(button, "Stop");
     }
@@ -272,13 +272,13 @@ void on_start_button_clicked(GtkButton *button, gpointer data)
 
 void on_clear_button_clicked(GtkButton *button, gpointer data)
 {
-    points_count = 0;
+    g_points_count = 0;
 }
 
 
 void on_reset_button_clicked(GtkButton *button, gpointer data)
 {
-    epoch_count = 0;
+    g_epoch_count = 0;
     init_network();
 }
 
@@ -291,12 +291,12 @@ void on_rng_button_clicked(GtkButton *button, gpointer data)
     int POINTS_MAX = 20;
     int points_cnt = fRand() * POINTS_MAX;
 
-    points_count = 0; // clear points
+    g_points_count = 0; // clear points
     for(int i = 0; i < points_cnt; i++){
-        points[points_count].x = fRand();
-        points[points_count].y = fRand();
-        points[points_count].color = fRand() > 0.5;
-        points_count++;
+        g_points[g_points_count].x = fRand();
+        g_points[g_points_count].y = fRand();
+        g_points[g_points_count].color = fRand() > 0.5;
+        g_points_count++;
     }
 }
 
@@ -308,19 +308,19 @@ void on_drawing_area_clicked(GtkWidget *widget, GdkEventButton *event, gpointer 
     pf("area clicked btn: %d x: %f y: %f\n", event->button, event->x, event->y);
     int width = gtk_widget_get_allocated_width(widget);
     int height = gtk_widget_get_allocated_height(widget);
-    width = MIN(width, buf_width);
-    height = MIN(height, buf_height);
+    width = MIN(width, g_buf_width);
+    height = MIN(height, g_buf_height);
     
     if(event->x > width || event->y > height)
         return;
 
-    points[points_count].x = event->x / width;
-    points[points_count].y = event->y / height;
-    points[points_count].color = event->button == 1 ? 0 : 1;
-    points_count++;
+    g_points[g_points_count].x = event->x / width;
+    g_points[g_points_count].y = event->y / height;
+    g_points[g_points_count].color = event->button == 1 ? 0 : 1;
+    g_points_count++;
 
     gtk_widget_queue_draw(widget);
-    pf("added new point. Total points: %d\n", points_count);
+    pf("added new point. Total points: %d\n", g_points_count);
 }
 
 void on_combo1_changed(GtkComboBox *combo, gpointer data){
@@ -343,14 +343,14 @@ void on_combo2_changed(GtkComboBox *combo, gpointer data){
 
 void on_switch1_changed(GtkSwitch *sw, gpointer data){
     gint act = gtk_switch_get_active(sw);
-    thread_sleep = (bool) act;
+    g_thread_sleep = (bool) act;
     pf("sleep active %d\n", act);
 }
 
 std::string get_network_title(Network * network){
     std::string result = "";
-    for(int l = 0; l < net->layersCount(); l++){
-        result += (l ? "-" : "") + std::to_string(net->getLayer(l)->size) ;
+    for(int l = 0; l < g_net->layersCount(); l++){
+        result += (l ? "-" : "") + std::to_string(g_net->getLayer(l)->size) ;
     }
     return result;
 }
@@ -373,7 +373,7 @@ void activate(GtkApplication *app, gpointer user_data)
     GtkWidget *switch1;
 
     window = gtk_application_window_new(app);
-    static std::string window_title = "Network " + get_network_title(net);
+    static std::string window_title = "Network " + get_network_title(g_net);
     gtk_window_set_title(GTK_WINDOW(window), window_title.c_str());
     // gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
