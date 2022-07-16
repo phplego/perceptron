@@ -205,6 +205,7 @@ gboolean timeout_redraw(GtkWidget *widget)
 
 gboolean timeout_label(GtkWidget *widget)
 {
+    if(!widget) return FALSE;
     static int last_time_ms = 0;
     static int last_epoch_count = 0;
     static int last_train_count = 0;
