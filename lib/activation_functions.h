@@ -21,8 +21,8 @@ ActivationBundle activation_bundles [ACTIVATION_BUNDLES_SIZE] = {
 
     ActivationBundle{ // Tanh
         name: "Tanh(x)",
-        activation: [](float x) { return 2.0f / (1.0f + (float)exp(-2*x));},
-        derivative: [](float y) { return 1.0f - y * y;},
+        activation: [](float x) { return 1.0f / (1.0f + (float)exp(-2*x));},
+        derivative: [](float y) { return y * (1.0f - y * y);},
     },
 
     ActivationBundle{ // Leaky ReLU
