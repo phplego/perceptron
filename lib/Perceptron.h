@@ -2,9 +2,11 @@
 
 class Perceptron {
 
-    // static variables
-    public: static float learning_rate;
+    // class variables
+    public: 
+        static float learning_rate;
 
+    // instance variables
     public: 
         const char * name;   // Perceptron shiny name.
         float ** inputs;     // Array of pointers(!) Because they will refer to previous perceptron 'result'   
@@ -14,6 +16,7 @@ class Perceptron {
         float error;
         float result;
 
+    // instance methods
     public:
         Perceptron(const char * name, int input_count);
         ~Perceptron();
