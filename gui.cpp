@@ -14,6 +14,21 @@ typedef struct
     int color; // 0 - blue, 1 - red
 } Point;
 
+
+#define LEARNING_RATES_COUNT 6
+#define LEARNING_RATE_DEFAULT_INDEX 3
+struct {
+    float value;
+    const char * label;
+} g_learning_rates [LEARNING_RATES_COUNT] = {
+    {0.001, "LR 0.001"}, 
+    {0.005, "LR 0.005"}, 
+    {0.01,  "LR 0.01"}, 
+    {0.05,  "LR 0.05"}, 
+    {0.1,   "LR 0.1"}, 
+    {0.2,   "LR 0.2"},
+};  
+
 int g_epoch_count = 0; // epoch means training the neural network with all the training data for one cycle
 int g_train_count = 0; // number of singe trainings. (train_count = epoch_count * points_count)
 
@@ -332,14 +347,8 @@ void on_combo1_changed(GtkComboBox *combo, gpointer data){
 
 void on_combo2_changed(GtkComboBox *combo, gpointer data){
     gint act = gtk_combo_box_get_active(combo);
-    switch(act){
-        case 0: learning_rate = 0.005; break;
-        case 1: learning_rate = 0.01; break;
-        case 2: learning_rate = 0.05; break;
-        case 3: learning_rate = 0.1;  break;
-        case 4: learning_rate = 0.2;  break;
-    }
-    pf("LR changed to %f\n", learning_rate);
+    Perceptron::learning_rate = g_learning_rates[act].value;
+    pf("LR changed to %f\n", Perceptron::learning_rate);
 }
 
 void on_switch1_changed(GtkSwitch *sw, gpointer data){
@@ -422,12 +431,10 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_container_add(GTK_CONTAINER(button_box2), combo1);
 
     combo2 = gtk_combo_box_text_new();
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.005");
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.01");
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.05");
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.10");
-    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, "LR 0.2");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(combo2), 2); // 0.05
+    for(int i=0; i < LEARNING_RATES_COUNT; i++){
+        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo2), NULL, g_learning_rates[i].label);
+    }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo2), LEARNING_RATE_DEFAULT_INDEX);
     g_signal_connect(combo2, "changed", G_CALLBACK(on_combo2_changed), NULL);
     gtk_container_add(GTK_CONTAINER(button_box2), combo2);
 

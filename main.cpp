@@ -127,7 +127,7 @@ int main(int argc, char * argv [])
 { 
     pf("Usage: %s [seed] [steps] \n", argv[0]);
 
-    //learning_rate = 0.007f;
+    //Perceptron::learning_rate = 0.007f;
     activation_function_index = 0;
 
     int seed = time(NULL); 
@@ -189,7 +189,7 @@ int main(int argc, char * argv [])
             float data [2] = {learn_data[sample][9], learn_data[sample][10]};
             net.learn(data, 2);
 
-            pf("error sum: " _RED "%+.3f  " _RST " outerr:" _YELLOW " %f" _RST " LR: %f\n", net.errorSum(), net.outLayer()->errorSum(), learning_rate);
+            pf("error sum: " _RED "%+.3f  " _RST " outerr:" _YELLOW " %f" _RST " LR: %f\n", net.errorSum(), net.outLayer()->errorSum(), Perceptron::learning_rate);
 
             // save to file
             char buf [100];

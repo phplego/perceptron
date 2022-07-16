@@ -57,3 +57,13 @@ ActivationBundle activation_bundles [ACTIVATION_BUNDLES_SIZE] = {
     },
 };
 
+
+int activation_function_index   = 0;
+
+FLOAT_FUNCTION activation_function = [](float x) { 
+    return activation_bundles[activation_function_index].activation(x);
+};
+
+FLOAT_FUNCTION derivative_function = [](float y) { 
+    return activation_bundles[activation_function_index].derivative(y);
+};

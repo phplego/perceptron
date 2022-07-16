@@ -3,19 +3,7 @@
 #include "activation_functions.h"
 #include "Perceptron.h"
 
-
-float learning_rate             = 0.05;
-int activation_function_index   = 0;
-
-
-FLOAT_FUNCTION activation_function = [](float x) { 
-    return activation_bundles[activation_function_index].activation(x);
-};
-
-FLOAT_FUNCTION derivative_function = [](float y) { 
-    return activation_bundles[activation_function_index].derivative(y);
-};
-
+float Perceptron::learning_rate = 0.05;
 
 Perceptron::Perceptron(const char * name, int input_count)
 {
@@ -80,13 +68,13 @@ void Perceptron::update_weights()
     // update weights
     for(int i = 0; i < this->input_count; i++){
         float old_weight = this->weights[i];
-        this->weights[i] = correct_weight(learning_rate, this->weights[i], this->error, this->result, *this->inputs[i]);
+        this->weights[i] = correct_weight(Perceptron::learning_rate, this->weights[i], this->error, this->result, *this->inputs[i]);
         pf("w%+5.3f", this->weights[i]);
         pf(_CYAN "Δ%+.0fm " _RST, (this->weights[i] - old_weight) * 1000);
     }
     // correct bias same way as other weights have been corrected
     float old_bias = this->bias;
-    this->bias = correct_weight(learning_rate, this->bias, this->error, this->result, 1);
+    this->bias = correct_weight(Perceptron::learning_rate, this->bias, this->error, this->result, 1);
     pf_gray("b%+.2f", this->bias);
     pf_gray(_CYAN2 "Δ%+.0fm " _RST, (this->bias - old_bias) * 1000);
     

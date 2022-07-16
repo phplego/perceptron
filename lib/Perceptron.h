@@ -1,6 +1,10 @@
 #pragma once
 
 class Perceptron {
+
+    // static variables
+    public: static float learning_rate;
+
     public: 
         const char * name;   // Perceptron shiny name.
         float ** inputs;     // Array of pointers(!) Because they will refer to previous perceptron 'result'   
