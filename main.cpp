@@ -128,10 +128,10 @@ int main(int argc, char * argv [])
     pf("Usage: %s [seed] [steps] \n", argv[0]);
 
     //learning_rate = 0.007f;
-    //activation_function_index = 1;
+    activation_function_index = 0;
 
     int seed = time(NULL); 
-    int total_steps =  3000;
+    int total_epoches =  3000;
 
 
     if(argc > 1){
@@ -139,7 +139,7 @@ int main(int argc, char * argv [])
     }
 
     if(argc > 2){
-        total_steps = std::stoi(argv[2]);
+        total_epoches = std::stoi(argv[2]);
     }
 
     // initialize random generator with seed
@@ -159,16 +159,16 @@ int main(int argc, char * argv [])
 
 
     // learn cycle
-    for(int step = 0; step < total_steps; step++){
+    for(int epoch = 0; epoch < total_epoches; epoch++){
         //usleep(1);
-        float step_out_err_max = 0;
+        float epoch_out_err_max = 0;
 
         for(int sample = 0; sample < SAMPLES_COUNT; sample ++){
 
             //PRINT_ON = step > total_steps - 16;           // print only last 100
-            PRINT_ON = (step + 1) % 1000 == 0;  // print every 1000-th learn set
+            PRINT_ON = (epoch + 1) % 1000 == 0;  // print every 1000-th epoch
             
-            pf_green("\nsample #%d  step %d\n", sample, step);
+            pf_green("\nsample #%d  step %d\n", sample, epoch);
 
             for(int k=0; k < 9; k++){ // print sample square
                 if((k) % 3 == 0) pf("\n");
@@ -198,11 +198,11 @@ int main(int argc, char * argv [])
             
             sprintf(buf, "%f ", net.outLayer()->errorAbsSum());
             fputs(buf, file_errors_by_sample);  // save to by_sample plot file
-            step_out_err_max = std::max(step_out_err_max, net.outLayer()->errorAbsSum());
+            epoch_out_err_max = std::max(epoch_out_err_max, net.outLayer()->errorAbsSum());
         }
         fputs("\n", file_errors_by_sample);
 
-        pf("step_out_err_max: " _BG_BLUE " %f " _RST " seed: %d\n", step_out_err_max, seed);
+        pf("epoch_out_err_max: " _BG_BLUE " %f " _RST " seed: %d\n", epoch_out_err_max, seed);
     }
 
     fclose(file_errors_summary);
