@@ -9,7 +9,7 @@ struct ActivationBundle {
 };
 
 
-#define ACTIVATION_BUNDLES_SIZE 3
+#define ACTIVATION_BUNDLES_SIZE 4
 
 ActivationBundle activation_bundles [ACTIVATION_BUNDLES_SIZE] = {
     
@@ -17,6 +17,12 @@ ActivationBundle activation_bundles [ACTIVATION_BUNDLES_SIZE] = {
         name: "Sigmoid",
         activation: [](float x) { return 1.0f / (1.0f + (float)exp(-x));},
         derivative: [](float y) { return y * (1.0f - y);},
+    },
+
+    ActivationBundle{ // Tanh
+        name: "Tanh(x)",
+        activation: [](float x) { return 2.0f / (1.0f + (float)exp(-2*x));},
+        derivative: [](float y) { return 1.0f - y * y;},
     },
 
     ActivationBundle{ // Leaky ReLU

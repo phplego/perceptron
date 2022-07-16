@@ -1,1 +1,1 @@
-git --no-pager log --pretty=oneline #-n40
+git --no-pager log --pretty=oneline -n20
