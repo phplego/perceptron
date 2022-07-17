@@ -9,9 +9,9 @@ struct ActivationBundle {
 };
 
 
-#define ACTIVATION_BUNDLES_SIZE 4
+#define ACTIVATION_BUNDLES_COUNT 4
 
-ActivationBundle activation_bundles [ACTIVATION_BUNDLES_SIZE] = {
+ActivationBundle activation_bundles [ACTIVATION_BUNDLES_COUNT] = {
     
     ActivationBundle{ // Sigmoid / Logistic Function
         name: "Sigmoid",

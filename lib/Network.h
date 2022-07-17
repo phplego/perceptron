@@ -147,7 +147,7 @@ class Network
          * 
          * @param filename char * Filename 
          */
-        void dumpWeights(const char * filename){
+        void saveWeights(const char * filename){
             // calculate buffer size
             int values_count = 0;
             for (int l = 1; l < this->layers_count; l ++) {

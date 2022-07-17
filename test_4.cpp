@@ -30,7 +30,7 @@ int main(int argc, char * argv [])
         sprintf(buf, "%f ", value);
         fputs(buf, file);  
 
-        for(int i=0; i < ACTIVATION_BUNDLES_SIZE; i++){
+        for(int i=0; i < ACTIVATION_BUNDLES_COUNT; i++){
             sprintf(buf, "%f ", activation_bundles[i].activation(value));
             fputs(buf, file);  
         }
@@ -43,7 +43,7 @@ int main(int argc, char * argv [])
 
     std::string plot_parts = "";
     
-    for(int i=0; i < ACTIVATION_BUNDLES_SIZE; i++){
+    for(int i=0; i < ACTIVATION_BUNDLES_COUNT; i++){
         if(i > 0){
             plot_parts += ",\n";
         }

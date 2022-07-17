@@ -423,7 +423,7 @@ void activate(GtkApplication *app, gpointer user_data)
 
 
     combo1 = gtk_combo_box_text_new();
-    for(int i = 0; i < ACTIVATION_BUNDLES_SIZE; i++){
+    for(int i = 0; i < ACTIVATION_BUNDLES_COUNT; i++){
         gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo1), NULL, activation_bundles[i].name);
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo1), 0);

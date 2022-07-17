@@ -136,7 +136,7 @@ int main(int argc, char * argv [])
 
     if(argc > 1){
         int arg_value = std::stoi(argv[1]);
-        if(arg_value < 0 || arg_value >= ACTIVATION_BUNDLES_SIZE){
+        if(arg_value < 0 || arg_value >= ACTIVATION_BUNDLES_COUNT){
             pf_red("Error: wrong activation function (%d). Exit\n", arg_value);
             exit(1);
         }
@@ -240,7 +240,7 @@ int main(int argc, char * argv [])
       
     }
 
-    net.dumpWeights("weights.txt");
+    net.saveWeights("weights.txt");
 
     pf("Used Activation function: " _BG_RED " %s " _RST "\n", activation_bundles[activation_function_index].name);
 }
