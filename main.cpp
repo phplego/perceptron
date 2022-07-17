@@ -125,7 +125,7 @@ void print_results(float vert_value, float horz_value){
 
 int main(int argc, char * argv []) 
 { 
-    pf("Usage: %s [seed] [steps] \n", argv[0]);
+    pf("Usage: %s [activation-function] [seed] [epoches] \n", argv[0]);
 
     //Perceptron::learning_rate = 0.007f;
     activation_function_index = 0;
