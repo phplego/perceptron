@@ -174,10 +174,10 @@ int main(int argc, char * argv [])
 
         for(int sample = 0; sample < SAMPLES_COUNT; sample ++){
 
-            //PRINT_ON = step > total_steps - 16;           // print only last 100
-            PRINT_ON = (epoch + 1) % 1000 == 0;  // print every 1000-th epoch
+            //PRINT_ON = epoch > total_epoches - 10;    // print only last 10 epoches
+            PRINT_ON = (epoch + 1) % 1000 == 0;         // print every 1000-th epoch
             
-            pf_green("\nsample #%d  step %d\n", sample, epoch);
+            pf_green("\nepoch %d  sample #%d\n", epoch, sample);
 
             for(int k=0; k < 9; k++){ // print sample square
                 if((k) % 3 == 0) pf("\n");
@@ -198,7 +198,7 @@ int main(int argc, char * argv [])
             float data [2] = {learn_data[sample][9], learn_data[sample][10]};
             net.learn(data, 2);
 
-            pf("error sum: " _RED "%+.3f  " _RST " outerr:" _YELLOW " %f" _RST " LR: %f\n", net.errorSum(), net.outLayer()->errorSum(), Perceptron::learning_rate);
+            pf("error sum: " _RED "%+.3f  " _RST " outerr:" _YELLOW " %.3f" _RST "\n", net.errorSum(), net.outLayer()->errorSum());
 
             // save to file
             char buf [100];
@@ -211,7 +211,7 @@ int main(int argc, char * argv [])
         }
         fputs("\n", file_errors_by_sample);
 
-        pf("epoch_out_err_max: " _BG_BLUE " %f " _RST " seed: %d\n", epoch_out_err_max, seed);
+        pf("epoch_out_err_max: " _BG_BLUE " %.3f " _RST " seed: %d\n", epoch_out_err_max, seed);
     }
 
     fclose(file_errors_summary);
@@ -233,14 +233,12 @@ int main(int argc, char * argv [])
         }
 
         net.forward();
-
         print_results(net.outLayer()->perceptrons[0]->result, net.outLayer()->perceptrons[1]->result);
-
         net.printState();
-      
     }
 
     net.saveWeights("weights.txt");
 
-    pf("Used Activation function: " _BG_RED " %s " _RST "\n", activation_bundles[activation_function_index].name);
+   pf("Used Activation function: " _BG_RED " %s " _RST, activation_bundles[activation_function_index].name);
+   pf(" LR: " _BG_YELL " %g " _RST "\n", Perceptron::learning_rate);
 }
