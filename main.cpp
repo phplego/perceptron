@@ -135,11 +135,20 @@ int main(int argc, char * argv [])
 
 
     if(argc > 1){
-        seed = std::stoi(argv[1]);
+        int arg_value = std::stoi(argv[1]);
+        if(arg_value < 0 || arg_value >= ACTIVATION_BUNDLES_SIZE){
+            pf_red("Error: wrong activation function (%d). Exit\n", arg_value);
+            exit(1);
+        }
+        activation_function_index = arg_value;
     }
 
     if(argc > 2){
-        total_epoches = std::stoi(argv[2]);
+        seed = std::stoi(argv[2]);
+    }
+
+    if(argc > 3){
+        total_epoches = std::stoi(argv[3]);
     }
 
     // initialize random generator with seed
@@ -232,4 +241,6 @@ int main(int argc, char * argv [])
     }
 
     net.dumpWeights("weights.txt");
+
+    pf("Used Activation function: " _BG_RED " %s " _RST "\n", activation_bundles[activation_function_index].name);
 }
