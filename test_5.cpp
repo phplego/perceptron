@@ -9,7 +9,7 @@
 
 
 void store_line(std::string key, std::string value){
-    pf(_BLUE "'%s' = '%s'\n" _RST, key.c_str(), value.c_str());
+    pf( " key " _BLUE "'%s'" _RST "  value " _YELLOW "'%s'\n" _RST, key.c_str(), value.c_str());
 }            
 
 int main(int argc, char * argv []) 
