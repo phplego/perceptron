@@ -1,9 +1,14 @@
 # perceptron
 My simple C++ neural network
 
-## build
+## build main
 ```
-g++ main.cpp -I./lib
+g++ main.cpp -o main.out -I./lib
+```
+
+## build gui tool
+```
+g++ `pkg-config --cflags gtk+-3.0` gui.cpp `pkg-config --libs gtk+-3.0` -o gui.out -I./lib
 ```
 
 
