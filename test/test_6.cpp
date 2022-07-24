@@ -16,7 +16,7 @@ int main(int argc, char * argv [])
 { 
     pf_green("HTTP Server test..\n");
 
-    int server_fd, socket_descriptor, pid; 
+    int server_fd, socket_descriptor; 
     long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
