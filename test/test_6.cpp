@@ -16,7 +16,7 @@ int main(int argc, char * argv [])
 { 
     pf_green("HTTP Server test..\n");
 
-    int server_fd, new_socket, pid; 
+    int server_fd, socket_descriptor, pid; 
     long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -50,13 +50,13 @@ int main(int argc, char * argv [])
     while(1)
     {
         pf_magenta("\nWaiting for connection...\n\n");
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
+        if ((socket_descriptor = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
         {
             pf_red("Error: accept() failed\n");
             exit(1);
         }
         char buffer[30000] = {0};
-        valread = read( new_socket , buffer, 30000);
+        valread = read( socket_descriptor , buffer, 30000);
 
         printf("incoming message: \n");
         pf_gray("%s", buffer);
@@ -76,8 +76,8 @@ int main(int argc, char * argv [])
             strcat(response, method);
             strcat(response, " path: ");
             strcat(response, path);
-            write(new_socket, response, strlen(response));
-            //write(new_socket, path, strlen(path));
+            write(socket_descriptor, response, strlen(response));
+            //write(socket_descriptor, path, strlen(path));
             pf("<<< RESPONSE SENT\n");
         }
         
@@ -86,7 +86,7 @@ int main(int argc, char * argv [])
             // POST
         }
 
-        close(new_socket);
+        close(socket_descriptor);
         free(response);  
     }
 
