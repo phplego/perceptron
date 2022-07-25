@@ -115,9 +115,10 @@ void my_handler(int s)
     pf("sa_handler %d\n", s);
     socketServerRunning = false;
     webServerRunning = false;
+    //std::terminate();
 }
 
-void webservertheread(std::string msg){
+void webservertheread(){
     printf("Web Server thread started.. http://127.0.0.1:8089\n");
 
     webServer.setCallback([](std::string method, std::string path){
@@ -146,13 +147,12 @@ int main(int argc, char **argv)
     sigIntHandler.sa_handler = my_handler;
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
-
     sigaction(SIGINT, &sigIntHandler, NULL);
 
     socketServer.init();
 
-    std::thread t1(webservertheread, "hello thread!");
-    //t1.join();
+    std::thread thread1(webservertheread);
+    thread1.detach();
  
     while (socketServerRunning)
     {
