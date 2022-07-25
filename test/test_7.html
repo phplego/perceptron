@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <title>test 7</title>
+
+        <script>
+            function httpGet(theUrl)
+            {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open( 'GET', theUrl, false ); // false for synchronous request
+                xmlHttp.send( null );
+                return xmlHttp.responseText;
+            }
+
+            let connection = null;
+    
+            function connect() {
+    
+                let host = location.hostname;
+                if(host === 'localhost')
+                    host = '127.0.0.1';
+                connection = new WebSocket('ws://' + host + ':1234/');
+                console.log('Connection object', connection);
+                let reconnectIntervalHandle;
+                connection.onopen = function () {
+                    console.log(new Date(), ' Connected ' + new Date());
+                };
+                connection.onerror = function (error) {
+                    console.log(new Date(), 'WebSocket Error ', error);
+                };
+                connection.onmessage = function (e) {
+                    const out = document.getElementById('out');
+                    out.innerHTML += ">>> " + e.data + "\n";
+                    console.log('>>>', e.data);
+                };
+                connection.onclose = function () {
+                    console.log(new Date(), 'WebSocket connection closed');
+                };
+            }
+    
+            document.addEventListener('DOMContentLoaded', function(event) {
+                connect();
+
+                const $input = document.getElementById('input');
+                const $button = document.getElementById('send');
+                $input.addEventListener('keyup', function(event){
+                    if(event.keyCode != 13) return;
+                    connection.send($input.value);
+                    document.getElementById('out').innerHTML += ">>> " + $input.value + "\n"
+                });
+                $button.addEventListener('click', function(){
+                    connection.send($input.value);
+                    document.getElementById('out').innerHTML += ">>> " + $input.value  + "\n"
+                });
+                $input.focus();
+
+            });
+        </script>
+    </head>
+    <body>
+        <input type="text" id="input"><button id="send">send</button>
+        <pre id='out' style='font-size:0.8em; color: #aaa; height: 200px; overflow-y: scroll;'></pre>
+    </body>
+</html>

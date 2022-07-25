@@ -14,7 +14,7 @@ fi
 file="test_$TESTNAME"
 
 # build
-g++ "$file.cpp" -o $file.out -I../lib
+g++ "$file.cpp" -o $file.out -I../lib -pthread
 
 # if no error then run binary
 if [[ $? -eq 0 ]]

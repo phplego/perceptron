@@ -1,5 +1,9 @@
+#include <thread>
 #include <iostream>
 #include <signal.h>
+#include <fstream>
+#include <iostream>
+#include <sstream> //std::stringstream
 
 #include "definitions.h"
 #include "websocket.h"
@@ -23,7 +27,6 @@ public:
             return;
         }
 
-        running = true;
         std::cout << _GREEN << "Server running..." << _RST << std::endl;
     }
 
@@ -31,8 +34,6 @@ public:
     {
         wsserver.poll(this);
     }
-
-    void stop() { this->running = false; }
 
     // called when a new websocket connection is about to open
     // optional: origin, protocol, extensions will be nullptr if not exist in the request headers
@@ -102,18 +103,41 @@ public:
 
 private:
     WSServer wsserver;
-    bool running;
 };
 
 Server socketServer;
-
 webserver::WebServer webServer(8089);
+bool socketServerRunning = true;
+bool webServerRunning = true;
 
 void my_handler(int s)
 {
     pf("sa_handler %d\n", s);
-    socketServer.stop();
+    socketServerRunning = false;
+    webServerRunning = false;
 }
+
+void webservertheread(std::string msg){
+    printf("Web Server thread started.. http://127.0.0.1:8089\n");
+
+    webServer.setCallback([](std::string method, std::string path){
+        printf("method = %s\n", method.data());
+        std::ifstream file("test_7.html");
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        
+        return buffer.str();
+    });
+
+    while (webServerRunning)
+    {
+        webServer.handle();
+        usleep(1);
+    }
+    printf("Web Server thread exit.\n");
+}
+
+    
 
 int main(int argc, char **argv)
 {
@@ -127,17 +151,15 @@ int main(int argc, char **argv)
 
     socketServer.init();
 
-    webServer.setCallback([](std::string method, std::string path){
-        printf("method = %s\n", method.data());
-        return std::string("HELLO WORLD!");
-    });
-
-    while (1)
+    std::thread t1(webservertheread, "hello thread!");
+    //t1.join();
+ 
+    while (socketServerRunning)
     {
         socketServer.handle();
-        webServer.handle();
         usleep(1);
     }
 
+ 
     std::cout << "Server stopped." << std::endl;
 }
