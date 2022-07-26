@@ -9,25 +9,28 @@
 #include "websocket.h"
 #include "webserver.h"
 
-class Server
+#define WS_PORT 8666
+#define HTTP_PORT 8777
+
+class SocketServer
 {
 public:
     struct CMDConnData
     {
         bool login;
     };
-    using WSServer = websocket::WSServer<Server, CMDConnData>;
+    using WSServer = websocket::WSServer<SocketServer, CMDConnData>;
     using WSConn = WSServer::Connection;
 
     void init()
     {
-        if (!wsserver.init("0.0.0.0", 1234))
+        if (!wsserver.init("0.0.0.0", WS_PORT))
         {
-            std::cout << _RED "wsserver init failed: " << wsserver.getLastError() << _RST << std::endl;
+            std::cout << _RED "SocketServer init failed: " << wsserver.getLastError() << _RST << std::endl;
             return;
         }
 
-        std::cout << _GREEN << "Server running..." << _RST << std::endl;
+        std::cout << _GREEN << "SoketServer running..." << _RST << std::endl;
     }
 
     void handle()
@@ -105,8 +108,8 @@ private:
     WSServer wsserver;
 };
 
-Server socketServer;
-webserver::WebServer webServer(8089);
+SocketServer socketServer;
+webserver::WebServer webServer(HTTP_PORT);
 bool socketServerRunning = true;
 bool webServerRunning = true;
 
@@ -115,19 +118,22 @@ void my_handler(int s)
     pf("sa_handler %d\n", s);
     socketServerRunning = false;
     webServerRunning = false;
-    //std::terminate();
+    // std::terminate();
 }
 
-void webservertheread(){
-    printf("Web Server thread started.. http://127.0.0.1:8089\n");
+void webservertheread()
+{
+    pf_green("Web Server thread started.. http://127.0.0.1:%d\n", HTTP_PORT);
 
     webServer.setCallback([](std::string method, std::string path){
-        printf("method = %s\n", method.data());
-        std::ifstream file("test_7.html");
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        
-        return buffer.str();
+        pf_blue("method = %s\n", method.data());
+        if(path == "/"){
+            std::ifstream file("test_7.html");
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            return buffer.str();
+        }
+        return std::string("");
     });
 
     while (webServerRunning)
@@ -138,12 +144,9 @@ void webservertheread(){
     printf("Web Server thread exit.\n");
 }
 
-    
-
 int main(int argc, char **argv)
 {
     struct sigaction sigIntHandler;
-
     sigIntHandler.sa_handler = my_handler;
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
@@ -153,13 +156,13 @@ int main(int argc, char **argv)
 
     std::thread thread1(webservertheread);
     thread1.detach();
- 
+
+    pf_green("WebSocket Server started.. ws://127.0.0.1:%d\n", WS_PORT);
     while (socketServerRunning)
     {
         socketServer.handle();
         usleep(1);
     }
 
- 
     std::cout << "Server stopped." << std::endl;
 }

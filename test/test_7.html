@@ -18,7 +18,7 @@
                 let host = location.hostname;
                 if(host === 'localhost')
                     host = '127.0.0.1';
-                connection = new WebSocket('ws://' + host + ':1234/');
+                connection = new WebSocket('ws://' + host + ':8666/');
                 console.log('Connection object', connection);
                 let reconnectIntervalHandle;
                 connection.onopen = function () {

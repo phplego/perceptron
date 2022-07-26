@@ -67,7 +67,6 @@ namespace webserver {
 
         void handle()
         {
-            printf("web server handle()\n");
             if ((socket_descriptor = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
             {
                 printf("Error: accept() failed\n");
@@ -96,7 +95,7 @@ namespace webserver {
             std::string payload = "";
             if(this->callback){
                 payload = this->callback(method, path);
-                printf("callback call. PAYLOAD=%s\n", payload.data());
+                //printf("callback call. PAYLOAD=%s\n", payload.data());
             }
 
             std::string response = "";
