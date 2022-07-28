@@ -1,5 +1,5 @@
 #pragma once
-#include "definitions.h"
+#include "colored_output.h"
 #include "Layer.h"
 
 class Network 

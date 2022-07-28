@@ -2,7 +2,7 @@
 #include <sys/time.h>
 #include <gtk/gtk.h>
 
-#include "definitions.h"
+#include "colored_output.h"
 #include "Network.h"
 #include "Perceptron.cpp"
 #include "Layer.cpp"

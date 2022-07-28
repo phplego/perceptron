@@ -1,5 +1,5 @@
 #include <cstdio>
-#include "definitions.h"
+#include "colored_output.h"
 #include "Perceptron.h"
 #include "Perceptron.cpp"
 #include "Layer.cpp"

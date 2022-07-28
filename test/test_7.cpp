@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream> //std::stringstream
 
-#include "definitions.h"
+#include "colored_output.h"
 #include "websocket.h"
 #include "webserver.h"
 

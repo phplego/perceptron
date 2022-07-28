@@ -48,8 +48,6 @@ namespace webserver {
             {
                 printf("Error: bind() failed\n");
                 sleep(3);
-                //close(server_fd);
-                //exit(EXIT_FAILURE);
             }
             if (listen(server_fd, 10) < 0)
             {
@@ -72,13 +70,6 @@ namespace webserver {
                 printf("Error: accept() failed\n");
                 exit(1);
             }
-
-
-            // Put the socket in non-blocking mode:
-            // if(fcntl(socket_descriptor, F_SETFL, fcntl(socket_descriptor, F_GETFL) | O_NONBLOCK) < 0) {
-            //     // handle error
-            // }
-
 
             char buffer[30000] = {0};
             long valread = read( socket_descriptor , buffer, 30000);

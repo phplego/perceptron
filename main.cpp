@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
-#include "definitions.h"
+#include "colored_output.h"
 #include "Network.h"
 #include "Perceptron.cpp"
 #include "Layer.cpp"
