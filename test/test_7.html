@@ -45,11 +45,11 @@
                 $input.addEventListener('keyup', function(event){
                     if(event.keyCode != 13) return;
                     connection.send($input.value);
-                    document.getElementById('out').innerHTML += ">>> " + $input.value + "\n"
+                    document.getElementById('out').innerHTML += "<<< " + $input.value + "\n"
                 });
                 $button.addEventListener('click', function(){
                     connection.send($input.value);
-                    document.getElementById('out').innerHTML += ">>> " + $input.value  + "\n"
+                    document.getElementById('out').innerHTML += "<<< " + $input.value  + "\n"
                 });
                 $input.focus();
 
@@ -57,7 +57,10 @@
         </script>
     </head>
     <body>
-        <input type="text" id="input"><button id="send">send</button>
-        <pre id='out' style='font-size:0.8em; color: #aaa; height: 200px; overflow-y: scroll;'></pre>
+        <div style="width: 800px; margin: auto;">
+            <br><br><br>
+            <input type="text" id="input"><button id="send">send</button>
+            <pre id='out' style=''></pre>
+        </div>
     </body>
 </html>

@@ -139,7 +139,7 @@ void webservertheread()
     while (webServerRunning)
     {
         webServer.handle();
-        usleep(1);
+        usleep(1000*10);
     }
     printf("Web Server thread exit.\n");
 }
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     while (socketServerRunning)
     {
         socketServer.handle();
-        usleep(1);
+        usleep(1000*10);
     }
 
     std::cout << "Server stopped." << std::endl;
