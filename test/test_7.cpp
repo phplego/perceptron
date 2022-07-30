@@ -9,8 +9,8 @@
 #include "websocket.h"
 #include "webserver.h"
 
-#define WS_PORT 8666
-#define HTTP_PORT 8777
+#define WS_PORT     8666
+#define HTTP_PORT   8777
 
 class SocketServer
 {

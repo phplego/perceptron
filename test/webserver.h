@@ -44,9 +44,15 @@ namespace webserver {
             
             memset(address.sin_zero, '\0', sizeof address.sin_zero);
 
-            while (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
+            int retry_count = 0;
+            while (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
             {
-                printf("Error: bind() failed\n");
+                retry_count ++;
+                if(retry_count > 3){
+                    printf("Retry count has reached the limit. Giving up \n", port);
+                    break;
+                }
+                printf("Error: failed to bind port %d. Retry in 3 seconds.. \n", port);
                 sleep(3);
             }
             if (listen(server_fd, 10) < 0)
