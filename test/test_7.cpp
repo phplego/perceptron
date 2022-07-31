@@ -7,7 +7,7 @@
 
 #include "colored_output.h"
 #include "websocket.h"
-#include "webserver.h"
+#include "httpserver.h"
 
 #define WS_PORT     8666
 #define HTTP_PORT   8777
@@ -109,23 +109,22 @@ private:
 };
 
 SocketServer socketServer;
-webserver::WebServer webServer(HTTP_PORT);
+httpserver::HttpServer httpServer(HTTP_PORT);
 bool socketServerRunning = true;
-bool webServerRunning = true;
+bool httpServerRunning = true;
 
 void my_handler(int s)
 {
     pf("sa_handler %d\n", s);
     socketServerRunning = false;
-    webServerRunning = false;
-    // std::terminate();
+    httpServerRunning = false;
 }
 
 void webservertheread()
 {
     pf_green("Web Server thread started.. http://127.0.0.1:%d\n", HTTP_PORT);
 
-    webServer.setCallback([](std::string method, std::string path){
+    httpServer.setCallback([](std::string method, std::string path){
         pf_blue("method = %s\n", method.data());
         if(path == "/"){
             std::ifstream file("test_7.html");
@@ -133,12 +132,15 @@ void webservertheread()
             buffer << file.rdbuf();
             return buffer.str();
         }
+        else {
+            return std::string() + httpserver::HTTP_HEADER_404 + "404 Page not found hehe. Path=" + path;
+        }
         return std::string("");
     });
 
-    while (webServerRunning)
+    while (httpServerRunning)
     {
-        webServer.handle();
+        httpServer.handle();
         usleep(1000*10);
     }
     printf("Web Server thread exit.\n");

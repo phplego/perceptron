@@ -8,14 +8,16 @@
 #include <netinet/in.h>
 
 
-namespace webserver {
+namespace httpserver {
 
     typedef std::string (*CALLBACK_TYPE) (std::string method, std::string path);
 
-    std::string http_header =   "HTTP/1.1 200 Ok\r\n"
-                                "Content-Type: text/html\r\n\r\n";
+    const std::string HTTP_HEADER_OK =      "HTTP/1.1 200 Ok\r\n"
+                                            "Content-Type: text/html\r\n\r\n";
+    const std::string HTTP_HEADER_404 =     "HTTP/1.1 404 Not Found\r\n"
+                                            "Content-Type: text/html\r\n\r\n";
 
-    class WebServer{
+    class HttpServer{
         private:
             CALLBACK_TYPE callback = NULL;
         public:
@@ -25,7 +27,7 @@ namespace webserver {
 
 
         
-        WebServer(int port)
+        HttpServer(int port)
         {
             // Creating socket file descriptor
             if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -40,7 +42,7 @@ namespace webserver {
             address.sin_addr.s_addr = INADDR_ANY;
             address.sin_port = htons( port );
 
-            printf("WebServer constructor port=%d\n", port);
+            printf("HttpServer constructor port=%d\n", port);
             
             memset(address.sin_zero, '\0', sizeof address.sin_zero);
 
@@ -49,7 +51,7 @@ namespace webserver {
             {
                 retry_count ++;
                 if(retry_count > 3){
-                    printf("Retry count has reached the limit. Giving up \n", port);
+                    printf("Retry count has reached the limit. Giving up \n");
                     break;
                 }
                 printf("Error: failed to bind port %d. Retry in 3 seconds.. \n", port);
@@ -84,31 +86,30 @@ namespace webserver {
             printf("%s", buffer);
 
             char *method = strtok(buffer, " ");
-            printf("METHOD: %s\n", method);
-
             char *path = strtok(NULL, " ");  
-            printf("PATH:   %s\n", path);
 
             std::string payload = "";
             if(this->callback){
                 payload = this->callback(method, path);
-                //printf("callback call. PAYLOAD=%s\n", payload.data());
             }
 
             std::string response = "";
-            response.append(http_header);
+            
+            if(payload.rfind("HTTP/1.1 ", 0) != 0){
+                response.append(HTTP_HEADER_OK);
+            }
+            
             response.append(payload);
             write(socket_descriptor, response.data(), response.length());
             printf("write to socket. RESP=\n%s\n\n", response.data());
-
-
+            
             close(socket_descriptor);
         }
 
 
-        ~WebServer()
+        ~HttpServer()
         {
-            printf("~WebServer()\n");
+            printf("~HttpServer()\n");
         }
     };
 }
