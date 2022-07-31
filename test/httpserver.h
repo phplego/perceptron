@@ -82,8 +82,7 @@ namespace httpserver {
             char buffer[30000] = {0};
             long valread = read( socket_descriptor , buffer, 30000);
 
-            printf("incoming message: \n");
-            printf("%s", buffer);
+            printf("incoming message: '%s'\n", buffer);
 
             char *method = strtok(buffer, " ");
             char *path = strtok(NULL, " ");  
