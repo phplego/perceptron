@@ -91,7 +91,17 @@ public:
         strncpy(buf, data, pl_len);
         pf_yellow("<<< MSG: '%s' \n", buf);
 
-        conn.send(websocket::OPCODE_TEXT, (const uint8_t *)"resp", 4);
+
+        const char * cmd = "create network ";
+        if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
+            char net_buf [30];
+            strcpy(net_buf, buf + strlen(cmd));
+
+            reply(conn, std::string() + "created!" + net_buf);
+            return;
+        }
+
+        reply(conn, "default response");
     }
 
     // onWSSegment is used if RecvSegment == true, called when a segment is received
@@ -100,6 +110,12 @@ public:
     void onWSSegment(WSConn &conn, uint8_t opcode, const uint8_t *payload, uint32_t pl_len, uint32_t pl_start_idx, bool fin)
     {
         std::cout << "error: onWSSegment should not be called" << std::endl;
+    }
+
+    void reply(WSConn &conn, std::string str)
+    {
+        conn.send(websocket::OPCODE_TEXT, (const uint8_t *)str.data(), str.length());
+        pf_blue(">>> RPL: '%s' \n", str.data());
     }
 
 private:
