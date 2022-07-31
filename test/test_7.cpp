@@ -97,7 +97,16 @@ public:
             char net_buf [30];
             strcpy(net_buf, buf + strlen(cmd));
 
-            reply(conn, std::string() + "created!" + net_buf);
+            reply(conn, std::string() + "created! " + net_buf);
+            return;
+        }
+
+        cmd = "reset";
+        if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
+            char net_buf [30];
+            strcpy(net_buf, buf + strlen(cmd));
+
+            reply(conn, "resetting..");
             return;
         }
 
