@@ -89,7 +89,7 @@ namespace httpserver {
             char *path = strtok(NULL, " ");  
 
             std::string payload = "";
-            if(this->callback){
+            if(this->callback && method && path){
                 payload = this->callback(method, path);
             }
 
