@@ -29,8 +29,6 @@ public:
             std::cout << _RED "SocketServer init failed: " << wsserver.getLastError() << _RST << std::endl;
             return;
         }
-
-        std::cout << _GREEN << "SoketServer running..." << _RST << std::endl;
     }
 
     void handle()
