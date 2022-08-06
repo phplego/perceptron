@@ -89,23 +89,20 @@ public:
         const char *data = (const char *)payload;
         char buf[1000] = {0};
         strncpy(buf, data, pl_len);
-        pf_yellow("<<< MSG: '%s' \n", buf);
+        pf_yellow("<<< MSG: '%s' len: %zd \n", buf, strlen(buf));
 
 
         const char * cmd = "create network ";
         if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
-            char net_buf [30];
-            strcpy(net_buf, buf + strlen(cmd));
+            char arg_buf [30];
+            strcpy(arg_buf, buf + strlen(cmd));
 
-            reply(conn, std::string() + "created! " + net_buf);
+            reply(conn, std::string() + "created! " + arg_buf);
             return;
         }
 
         cmd = "reset";
         if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
-            char net_buf [30];
-            strcpy(net_buf, buf + strlen(cmd));
-
             reply(conn, "resetting..");
             return;
         }
@@ -124,7 +121,7 @@ public:
     void reply(WSConn &conn, std::string str)
     {
         conn.send(websocket::OPCODE_TEXT, (const uint8_t *)str.data(), str.length());
-        pf_blue(">>> RPL: '%s' \n", str.data());
+        pf_blue(">>> RPL: '%s' len: %zd \n", str.data(), str.length());
     }
 
 private:
