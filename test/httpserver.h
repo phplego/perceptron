@@ -100,7 +100,7 @@ namespace httpserver {
             
             response.append(payload);
             write(socket_descriptor, response.data(), response.length());
-            printf("write to socket. RESP=\n%s\n\n", response.data());
+            //printf("write to socket. RESP=\n%s\n\n", response.data());
             
             close(socket_descriptor);
         }

@@ -12,6 +12,20 @@
 #define WS_PORT     8666
 #define HTTP_PORT   8777
 
+std::string get_process_memory(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    char line[128] = {0};
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmRSS:", 6) == 0){
+            line[strlen(line) - 1] = 0;
+            return line;
+        }
+    }
+    fclose(file);
+    return "N/A";
+}
+
 class SocketServer
 {
 public:
@@ -62,6 +76,7 @@ public:
         {
             std::cout << "extensions: " << extensions << std::endl;
         }
+        std::cout << std::endl;
         return true;
     }
 
@@ -92,7 +107,7 @@ public:
         pf_yellow("<<< MSG: '%s' len: %zd \n", buf, strlen(buf));
 
 
-        const char * cmd = "create network ";
+        const char * cmd = "c n ";
         if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
             char arg_buf [30];
             strcpy(arg_buf, buf + strlen(cmd));
@@ -104,6 +119,11 @@ public:
         cmd = "reset";
         if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
             reply(conn, "resetting..");
+            return;
+        }
+        cmd = "mem";
+        if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
+            reply(conn, get_process_memory());
             return;
         }
 
@@ -152,10 +172,9 @@ void webservertheread()
             buffer << file.rdbuf();
             return buffer.str();
         }
-        else {
-            return std::string() + httpserver::HTTP_HEADER_404 + "404 Page not found hehe. Path=" + path;
-        }
-        return std::string("");
+
+        
+        return std::string() + httpserver::HTTP_HEADER_404 + "404 Page not found hehe. Path=" + path;
     });
 
     while (httpServerRunning)
