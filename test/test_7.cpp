@@ -64,16 +64,13 @@ public:
         std::cout << "Receive WS connection from: " << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port) << std::endl;
         std::cout << "request_uri: " << request_uri << std::endl;
         std::cout << "host: " << host << std::endl;
-        if (origin)
-        {
+        if (origin){
             std::cout << "origin: " << origin << std::endl;
         }
-        if (protocol)
-        {
+        if (protocol){
             std::cout << "protocol: " << protocol << std::endl;
         }
-        if (extensions)
-        {
+        if (extensions){
             std::cout << "extensions: " << extensions << std::endl;
         }
         std::cout << std::endl;
@@ -107,12 +104,12 @@ public:
         pf_yellow("<<< MSG: '%s' len: %zd \n", buf, strlen(buf));
 
 
-        const char * cmd = "c n ";
+        const char * cmd = "cn ";
         if(strncasecmp(cmd, buf, strlen(cmd)) == 0){
             char arg_buf [30];
             strcpy(arg_buf, buf + strlen(cmd));
 
-            reply(conn, std::string() + "created! " + arg_buf);
+            reply(conn, std::string() + "creating network: " + arg_buf);
             return;
         }
 
