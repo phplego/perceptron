@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <cstring>
+#include <chrono>
 #include "colored_output.h"
 #include "Network.h"
 #include "Perceptron.cpp"
@@ -122,6 +123,13 @@ void print_results(float vert_value, float horz_value){
     pf("\n");
 }
 
+int time_ms(){
+    std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(
+        std::chrono::system_clock::now().time_since_epoch()
+    );
+    return ms.count();
+}
+
 
 int main(int argc, char * argv []) 
 { 
@@ -129,7 +137,9 @@ int main(int argc, char * argv [])
 
     //Perceptron::learning_rate = 0.007f;
     activation_function_index = 0;
-
+    int train_count = 0;
+    
+    int start_timestamp_ms = time_ms();
     int seed = time(NULL); 
     int total_epoches =  3000;
 
@@ -197,6 +207,7 @@ int main(int argc, char * argv [])
             // lear the sample
             float data [2] = {learn_data[sample][9], learn_data[sample][10]};
             net.learn(data, 2);
+            train_count++;
 
             pf("error sum: " _RED "%+.3f  " _RST " outerr:" _YELLOW " %.3f" _RST "\n", net.errorSum(), net.outLayer()->errorSum());
 
@@ -241,4 +252,7 @@ int main(int argc, char * argv [])
 
    pf("Used Activation function: " _BG_RED " %s " _RST, activation_bundles[activation_function_index].name);
    pf(" LR: " _BG_YELL " %g " _RST "\n", Perceptron::learning_rate);
+   pf("train count: %d\n", train_count);
+   pf("train count / ms: %d\n", train_count / (time_ms() - start_timestamp_ms));
+   pf("exec time: %g sec\n", (float)(time_ms() - start_timestamp_ms)/1000);
 }
