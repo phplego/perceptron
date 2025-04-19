@@ -1,3 +1,5 @@
+#!/bin/bash
+
 g++ main.cpp -o main.out -I./lib
 
 if [[ $? -eq 0 ]]
